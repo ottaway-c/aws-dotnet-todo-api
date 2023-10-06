@@ -33,7 +33,7 @@ builder.Services.SwaggerDocument(x =>
     x.MaxEndpointVersion = 1;
     x.DocumentSettings = s =>
     {
-        s.Title = "ClearPoint Todo API";
+        s.Title = "Todo API";
         s.DocumentName = "Initial Release";
         s.Version = "v1";
     };
