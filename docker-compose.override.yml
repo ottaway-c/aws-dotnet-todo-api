@@ -1,0 +1,45 @@
+networks:
+  # This special network is configured so that the local metadata
+  # service can bind to the specific IP address that ECS uses
+  # in production
+  credentials_network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: "169.254.170.0/24"
+          gateway: 169.254.170.1
+services:
+  # This container vends AWS credentials to the container
+  ecs-local-endpoints:
+    image: amazon/amazon-ecs-local-container-endpoints
+    volumes:
+      - /var/run:/var/run
+      # Mount the shared configuration directory, used by the AWS CLI and AWS SDKs
+      # On Windows, this directory can be found at "%UserProfile%\.aws"
+      - $AWS_CONFIGURATION_DIRECTORY:/home/.aws/
+    environment:
+      AWS_CONFIGURATION_DIRECTORY: $AWS_CONFIGURATION_DIRECTORY
+      AWS_PROFILE: $AWS_PROFILE
+    networks:
+      credentials_network:
+        # This special IP address is recognized by the AWS SDKs and AWS CLI
+        ipv4_address: "169.254.170.2"
+        
+  todo-api:
+    depends_on:
+      - ecs-local-endpoints
+    networks:
+      credentials_network:
+        ipv4_address: "169.254.170.3"
+    # Note: 
+    # We have to override the entrypoint to allow the debugger to attach to the container
+    # The standard lambda entrypoint is not compatible with debugging
+    entrypoint: ["dotnet",  "Todo.Api.dll"]
+    environment:
+      AWS_DEFAULT_REGION: $CDK_DEFAULT_REGION
+      AWS_REGION: $CDK_DEFAULT_REGION
+      ECS_CONTAINER_METADATA_URI: "http://169.254.170.2"
+      AWS_CONTAINER_CREDENTIALS_RELATIVE_URI: "/creds"
+      SERVICE: $SERVICE
+      STAGE: $STAGE
+      PORT: "80"
