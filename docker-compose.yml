@@ -1,0 +1,9 @@
+﻿services:
+  todo-api:
+    image: "${CDK_DEFAULT_ACCOUNT}.dkr.ecr.${CDK_DEFAULT_REGION}.amazonaws.com/${SERVICE}-${STAGE}-ecr-function-repository:${TAG}"
+    build:
+      context: .
+      dockerfile: src/Todo.Api/Dockerfile
+    ports:
+      - "5000:80"
+      - "5001:443"
