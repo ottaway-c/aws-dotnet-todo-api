@@ -52,7 +52,7 @@ builder.Services.AddSingleton(x =>
     var regionEndpoint = EfficientDynamoDb.Configs.RegionEndpoint.Create(region);
     var chain = new CredentialProfileStoreChain();
     
-    if (chain.TryGetAWSCredentials("clearpoint-api", out var credentials))
+    if (chain.TryGetAWSCredentials("todo-api", out var credentials))
     {
         // Running locally
     }
@@ -84,7 +84,6 @@ var app = builder.Build();
 app.UseHttpsRedirection();
 app.UseSerilogRequestLogging();
 app.UseDefaultExceptionHandler();
-app.UseAuthorization();
 app.UseFastEndpoints(x =>
 {
     x.Versioning.Prefix = "v";
