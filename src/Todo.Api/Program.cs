@@ -52,7 +52,7 @@ builder.Services.AddSingleton(x =>
     var regionEndpoint = EfficientDynamoDb.Configs.RegionEndpoint.Create(region);
     var chain = new CredentialProfileStoreChain();
     
-    if (chain.TryGetAWSCredentials("clearpoint-api", out var credentials))
+    if (chain.TryGetAWSCredentials("todo-api", out var credentials))
     {
         // Running locally
     }
