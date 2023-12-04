@@ -84,7 +84,6 @@ var app = builder.Build();
 app.UseHttpsRedirection();
 app.UseSerilogRequestLogging();
 app.UseDefaultExceptionHandler();
-app.UseAuthorization();
 app.UseFastEndpoints(x =>
 {
     x.Versioning.Prefix = "v";
