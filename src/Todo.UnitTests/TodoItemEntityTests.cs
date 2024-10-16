@@ -23,8 +23,10 @@ public class TodoItemEntityTests
         
         entity.Should().NotBeNull();
         entity.TodoItemId.Should().NotBeNull();
-        entity.PK.Should().BeEquivalentTo($"TENANT#{entity.TenantId}");
-        entity.SK.Should().BeEquivalentTo($"TODOITEM#{entity.TodoItemId}");
+        entity.PK.Should().Be($"TENANT#{entity.TenantId}#TODOITEM#{entity.TodoItemId}");
+        entity.SK.Should().Be($"TODOITEM#{entity.TodoItemId}");
+        entity.GSI1PK.Should().Be($"TENANT#{entity.TenantId}");
+        entity.GSI1SK.Should().Be($"TODOITEM#{entity.TodoItemId}");
         entity.Title.Should().BeEquivalentTo(args.Title);
         entity.Notes.Should().BeEquivalentTo(args.Notes);
         entity.IsCompleted.Should().BeFalse();

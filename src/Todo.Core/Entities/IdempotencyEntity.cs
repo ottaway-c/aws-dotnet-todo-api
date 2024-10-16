@@ -4,7 +4,7 @@ namespace Todo.Core.Entities;
 
 public class IdempotencyEntity : BaseEntity
 {
-    public static string Pk(string tenantId, Ulid idempotencyToken) => $"TENANT#{tenantId}#IDEMPOTENCY#{idempotencyToken}#";
+    public static string Pk(string tenantId, Ulid idempotencyToken) => $"TENANT#{tenantId}#IDEMPOTENCY#{idempotencyToken}";
     public static string Sk(Ulid idempotencyToken) =>  $"IDEMPOTENCY#{idempotencyToken}";
     
     [DynamoDbProperty(nameof(TodoItemId), typeof(UlidConverter))]
