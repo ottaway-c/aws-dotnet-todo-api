@@ -48,7 +48,6 @@ public class GetTodoItemEndpoint(IDynamoDbStore ddbStore, Mapper mapper)
         }
         
         var todoItemDto = mapper.TodoItemEntityToDto(entity);
-
         var response = new GetTodoItemResponse
         {
             TodoItem = todoItemDto
