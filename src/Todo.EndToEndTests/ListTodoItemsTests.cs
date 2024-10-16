@@ -1,15 +1,15 @@
 using FluentAssertions;
 using FluentAssertions.Extensions;
+using Xunit.Abstractions;
 
 namespace Todo.EndToEndTests;
 
-public class ListTodoItemsTests
+public class ListTodoItemsTests(Fixture fixture, ITestOutputHelper output) : TestClass<Fixture>(fixture, output)
 {
     [Fact]
     public async Task ListTodoItemsBasicOk()
     {
-        var fixture = await Fixture.Ensure();
-        var client = fixture.Client;
+        var client = Fixture.Client;
         
         var tenantId = Ulid.NewUlid();
         
@@ -19,13 +19,13 @@ public class ListTodoItemsTests
             for (var i = 0; i < total; i++)
             {
                 var args = Given.CreateTodoItemArgs(tenantId);
-                await fixture.DdbStore.CreateTodoItemAsync(args, CancellationToken.None);
+                await Fixture.DdbStore.CreateTodoItemAsync(args, CancellationToken.None);
             }
         }
 
         {
             var args = Given.CreateTodoItemArgs(); // Note: Different Tenant Id
-            await fixture.DdbStore.CreateTodoItemAsync(args, CancellationToken.None);
+            await Fixture.DdbStore.CreateTodoItemAsync(args, CancellationToken.None);
         }
         
         Func<Task> asyncRetry = async () =>
@@ -34,7 +34,7 @@ public class ListTodoItemsTests
             var response = await client.ListTodoItemsAsync(tenantId);
             
             response.Should().NotBeNull();
-            response!.TodoItems.Should().NotBeNull();
+            response.TodoItems.Should().NotBeNull();
             
             response.TodoItems.Count.Should().Be(total);
             response.TodoItems.Should().OnlyHaveUniqueItems();

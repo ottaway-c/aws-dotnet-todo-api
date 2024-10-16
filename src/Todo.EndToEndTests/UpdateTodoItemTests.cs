@@ -1,19 +1,19 @@
 using FluentAssertions;
+using Xunit.Abstractions;
 
 namespace Todo.EndToEndTests;
 
-public class UpdateTodoItemTests
+public class UpdateTodoItemTests(Fixture fixture, ITestOutputHelper output) : TestClass<Fixture>(fixture, output)
 {
     [Fact]
     public async Task UpdateTodoItemOk()
     {
-        var fixture = await Fixture.Ensure();
-        var client = fixture.Client;
+        var client = Fixture.Client;
         
         var now = DateTime.UtcNow;
         
         var args = Given.CreateTodoItemArgs();
-        var entity = await fixture.DdbStore.CreateTodoItemAsync(args, CancellationToken.None);
+        var entity = await Fixture.DdbStore.CreateTodoItemAsync(args, CancellationToken.None);
 
         var request = Given.UpdateTodoItemRequest();
         var response = await client.UpdateTodoItemAsync(entity.TenantId, entity.TodoItemId, request);
