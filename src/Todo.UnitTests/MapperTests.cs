@@ -17,6 +17,8 @@ public class MapperTests
         {
             PK = "",
             SK = "",
+            GSI1PK = "",
+            GSI1SK = "",
             TodoItemId = Ulid.NewUlid(),
             Title = "Put out the washing",
             Notes = "Reminder: Clothes are still in the machine!",

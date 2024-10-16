@@ -44,6 +44,19 @@ export class AppStack extends cdk.Stack {
       removalPolicy: cdk.RemovalPolicy.DESTROY,
     });
 
+    dynamoTable.addGlobalSecondaryIndex({
+      indexName: "GSI1",
+      partitionKey: {
+        name: "GSI1PK",
+        type: dynamodb.AttributeType.STRING,
+      },
+      sortKey: {
+        name: "GSI1SK",
+        type: dynamodb.AttributeType.STRING,
+      },
+      projectionType: dynamodb.ProjectionType.ALL,
+    });
+
     const lambdaFunction = new lambda.DockerImageFunction(this, "LambdaFunction", {
       code: lambda.DockerImageCode.fromEcr(props.functionRepository, {
         tagOrDigest: props.tag,

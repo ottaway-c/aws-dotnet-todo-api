@@ -14,6 +14,8 @@ public partial class Mapper
     
     [MapperIgnoreSource(nameof(TodoItemEntity.PK))]
     [MapperIgnoreSource(nameof(TodoItemEntity.SK))]
+    [MapperIgnoreSource(nameof(TodoItemEntity.GSI1PK))]
+    [MapperIgnoreSource(nameof(TodoItemEntity.GSI1SK))]
     [MapperIgnoreSource(nameof(TodoItemEntity.Entity))]
     public partial TodoItemDto TodoItemEntityToDto(TodoItemEntity entity);
 }
