@@ -25,9 +25,9 @@ jobs:
       - uses: actions/setup-dotnet@v4
         with:
           dotnet-version: 8.0.x
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: 20
       - run: npm ci
       - uses: aws-actions/configure-aws-credentials@v3
         with:
@@ -38,7 +38,7 @@ jobs:
         run: npx cdk deploy ${{ env.SERVICE }}-${{ env.STAGE }}-ecr --require-approval never
       - name: Run login to aws ecr
         id: login-ecr
-        uses: aws-actions/amazon-ecr-login@v1
+        uses: aws-actions/amazon-ecr-login@v2
         with:
           mask-password: "true"
       - run: |
