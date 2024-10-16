@@ -59,8 +59,8 @@ I have included the following Github Actions that run when creating PR’s into 
 ## Prereqs
 
 - Install VS Code for working in CDK in Typescript
-- Install .Net 7 SDK https://dotnet.microsoft.com/en-us/download/dotnet/7.0
-- Install Node.js 18 LTS https://nodejs.org/en/
+- Install .Net 8 SDK https://dotnet.microsoft.com/en-us/download/dotnet/8.0
+- Install Node.js 20 LTS https://nodejs.org/en/
 - Install CDK cli tool globally https://docs.aws.amazon.com/cdk/v2/guide/getting_started.html
 - Install AWS cli tool https://aws.amazon.com/cli/ and setup default credentials using `aws configure`.
 
@@ -81,8 +81,7 @@ npm i
 Create a `.env` file and add the following variables:
 
 ```
-AWS_CONFIGURATION_DIRECTORY=~/.aws # The path to your AWS configuration directory. This is the standard location in Windows. MacOS, and Linux will be different.
-AWS_PROFILE=todo-api-docker # This is the profile ECS local endpoints will look for when vending credentials to the docker container.
+AWS_PROFILE=todo-api-docker # This is the profile ECS local endpoints will look for when vending credentials to the docker container. Note that integration/e2e tests will also use these creds when run locally.
 AWS_REGION=<AWS_REGION>
 CDK_DEFAULT_ACCOUNT=<AWS_ACCOUNT_ID>
 CDK_DEFAULT_REGION=<AWS_REGION>
@@ -100,20 +99,6 @@ aws configure sso --profile todo-api
 ## Running locally
 
 I have set this up to run with Docker-Compose in Rider. It probably works in Visual Studio as well, but I haven't tried it.
-
-**Note:**
-
-When running with Docker, the application uses [ECS local endpoints](https://github.com/awslabs/amazon-ecs-local-container-endpoints) to vend credentials to the container.
-Unfortunately this is not compatible with AWS SSO 😿. You will need to copy the temporary access key/secret key/session token from your AWS SSO console.
-
-Add the following to your `credentials` file located at `~/.aws/`:
-
-```
-[todo-api-docker]
-aws_access_key_id=<AWS_SSO_ACCESS_KEY_ID>
-aws_secret_access_key=<AWS_SSO_SECRET_ACCESS_KEY>
-aws_session_token=<AWS_SSO_SESSION_TOKEN>
-```
 
 ## Synth
 

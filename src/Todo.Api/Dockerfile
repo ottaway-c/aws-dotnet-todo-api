@@ -1,6 +1,6 @@
-﻿FROM public.ecr.aws/lambda/dotnet:7 AS base
+﻿FROM public.ecr.aws/lambda/dotnet:8 AS base
 
-FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 COPY ["src/Todo.Api/Todo.Api.csproj", "src/Todo.Api/"]
 COPY ["src/Todo.Core/Todo.Core.csproj", "src/Todo.Core/"]

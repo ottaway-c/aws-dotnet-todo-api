@@ -32,17 +32,9 @@ public class ListTodoItemsRequestValidator : Validator<ListTodoItemsRequest>
     }
 }
 
-public class ListTodoItemsEndpoint : Endpoint<ListTodoItemsRequest, ListTodoItemsResponse>
+public class ListTodoItemsEndpoint(IDynamoDbStore ddbStore, Mapper mapper)
+    : Endpoint<ListTodoItemsRequest, ListTodoItemsResponse>
 {
-    private readonly IDynamoDbStore _ddbStore;
-    private readonly Mapper _mapper;
-    
-    public ListTodoItemsEndpoint(IDynamoDbStore ddbStore)
-    {
-        _ddbStore = ddbStore;
-        _mapper = new Mapper();
-    }
-    
     public override void Configure()
     {
         Get("/api/{TenantId}/todo");
@@ -65,7 +57,7 @@ public class ListTodoItemsEndpoint : Endpoint<ListTodoItemsRequest, ListTodoItem
         // Note: Assign a default limit if the request does not contain one
         request.Limit ??= 25;
         
-        var page = await _ddbStore.ListTodoItemsAsync(request.TenantId!.Value, request.Limit.Value, request.IsCompleted, request.PaginationToken);
+        var page = await ddbStore.ListTodoItemsAsync(request.TenantId!.Value, request.Limit.Value, request.IsCompleted, request.PaginationToken);
         if (!page.Items.Any())
         {
             Response.TodoItems = new List<TodoItemDto>();
@@ -74,7 +66,7 @@ public class ListTodoItemsEndpoint : Endpoint<ListTodoItemsRequest, ListTodoItem
         
         var items = page.Items.Select(x =>
         {
-            var todoItem = _mapper.TodoItemEntityToDto(x);
+            var todoItem = mapper.TodoItemEntityToDto(x);
             return todoItem;
         }).ToList();
 

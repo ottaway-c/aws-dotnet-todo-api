@@ -26,17 +26,9 @@ public class GetTodoItemRequestValidator : Validator<GetTodoItemRequest>
     }
 }
 
-public class GetTodoItemEndpoint : Endpoint<GetTodoItemRequest, GetTodoItemResponse>
+public class GetTodoItemEndpoint(IDynamoDbStore ddbStore, Mapper mapper)
+    : Endpoint<GetTodoItemRequest, GetTodoItemResponse>
 {
-    private readonly IDynamoDbStore _ddbStore;
-    private readonly Mapper _mapper;
-    
-    public GetTodoItemEndpoint(IDynamoDbStore ddbStore)
-    {
-        _ddbStore = ddbStore;
-        _mapper = new Mapper();
-    }
-    
     public override void Configure()
     {
         Get("/api/{TenantId}/todo/{TodoItemId}");
@@ -54,7 +46,7 @@ public class GetTodoItemEndpoint : Endpoint<GetTodoItemRequest, GetTodoItemRespo
     
     public override async Task HandleAsync(GetTodoItemRequest request, CancellationToken ct)
     {
-        var entity = await _ddbStore.GetTodoItemAsync(request.TenantId!.Value, request.TodoItemId!.Value, ct);
+        var entity = await ddbStore.GetTodoItemAsync(request.TenantId!.Value, request.TodoItemId!.Value, ct);
         
         if (entity == null)
         {
@@ -62,7 +54,7 @@ public class GetTodoItemEndpoint : Endpoint<GetTodoItemRequest, GetTodoItemRespo
             return;
         }
         
-        var todoItemDto = _mapper.TodoItemEntityToDto(entity);
+        var todoItemDto = mapper.TodoItemEntityToDto(entity);
 
         Response.TodoItem = todoItemDto;
     }
