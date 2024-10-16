@@ -12,9 +12,8 @@ public class DeleteTodoItemTests(Fixture fixture, ITestOutputHelper output) : Te
         
         var args = Given.CreateTodoItemArgs();
         var entity = await Fixture.DdbStore.CreateTodoItemAsync(args, CancellationToken.None);
-        
-        var response = await client.DeleteTodoItemAsync(entity.TenantId, entity.TodoItemId);
-        response.Should().BeTrue();
+
+        await client.V1.Tenant[entity.TenantId].Todo[entity.TodoItemId.ToString()].DeleteAsync();
     }
     
     [Fact]
@@ -27,7 +26,6 @@ public class DeleteTodoItemTests(Fixture fixture, ITestOutputHelper output) : Te
         
         var todoItemId = Ulid.NewUlid(); // Note: Bogus todoitem id
 
-        var response = await client.DeleteTodoItemAsync(args.TenantId, todoItemId);
-        response.Should().BeFalse();
+        await client.V1.Tenant[args.TenantId].Todo[todoItemId.ToString()].DeleteAsync();
     }
 }

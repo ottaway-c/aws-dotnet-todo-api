@@ -16,11 +16,11 @@ public class UpdateTodoItemTests(Fixture fixture, ITestOutputHelper output) : Te
         var entity = await Fixture.DdbStore.CreateTodoItemAsync(args, CancellationToken.None);
 
         var request = Given.UpdateTodoItemRequest();
-        var response = await client.UpdateTodoItemAsync(entity.TenantId, entity.TodoItemId, request);
+        var response = await client.V1.Tenant[entity.TenantId].Todo[entity.TodoItemId.ToString()].PutAsync(request);
         
         response.Should().NotBeNull();
         response!.TodoItem.Should().NotBeNull();
-        response.TodoItem.TodoItemId.Should().NotBeNull();
+        response.TodoItem!.TodoItemId.Should().NotBeNull();
         response.TodoItem.TenantId.Should().Be(entity.TenantId);
         response.TodoItem.IdempotencyToken.Should().NotBeNull();
         response.TodoItem.Title.Should().Be(request.Title);

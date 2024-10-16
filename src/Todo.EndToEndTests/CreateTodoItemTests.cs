@@ -9,16 +9,17 @@ public class CreateTodoItemTests(Fixture fixture, ITestOutputHelper output) : Te
     public async Task CreateTodoItemOk()
     {
         var client = Fixture.Client;
+        var tenantId = Ulid.NewUlid();
         
         var now = DateTime.UtcNow;
         
         var request = Given.CreateTodoItemRequest();
-        var response = await client.CreateTodoItemAsync(request);
+        var response = await client.V1.Tenant[tenantId.ToString()].Todo.PostAsync(request);
         
         response.Should().NotBeNull();
-        response.TodoItem.Should().NotBeNull();
-        response.TodoItem.TodoItemId.Should().NotBeNull();
-        response.TodoItem.TenantId.Should().Be(request.TenantId);
+        response!.TodoItem.Should().NotBeNull();
+        response.TodoItem!.TodoItemId.Should().NotBeNull();
+        response.TodoItem.TenantId.Should().Be(tenantId.ToString());
         response.TodoItem.IdempotencyToken.Should().NotBeNull();
         response.TodoItem.Title.Should().Be(request.Title);
         response.TodoItem.Notes.Should().Be(request.Notes);

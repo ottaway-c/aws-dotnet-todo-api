@@ -18,7 +18,7 @@ public class ListTodoItemsTests(Fixture fixture, ITestOutputHelper output) : Tes
         {
             for (var i = 0; i < total; i++)
             {
-                var args = Given.CreateTodoItemArgs(tenantId);
+                var args = Given.CreateTodoItemArgs(tenantId.ToString());
                 await Fixture.DdbStore.CreateTodoItemAsync(args, CancellationToken.None);
             }
         }
@@ -31,12 +31,12 @@ public class ListTodoItemsTests(Fixture fixture, ITestOutputHelper output) : Tes
         Func<Task> asyncRetry = async () =>
         {
             // Note: The default API behaviour is to return 25 records
-            var response = await client.ListTodoItemsAsync(tenantId);
+            var response = await client.V1.Tenant[tenantId.ToString()].Todo.GetAsync();
             
             response.Should().NotBeNull();
-            response.TodoItems.Should().NotBeNull();
+            response!.TodoItems.Should().NotBeNull();
             
-            response.TodoItems.Count.Should().Be(total);
+            response.TodoItems!.Count.Should().Be(total);
             response.TodoItems.Should().OnlyHaveUniqueItems();
         };
         

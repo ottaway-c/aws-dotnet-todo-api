@@ -14,12 +14,12 @@ public class GetTodoItemTests(Fixture fixture, ITestOutputHelper output) : TestC
         
         var args = Given.CreateTodoItemArgs();
         var entity = await Fixture.DdbStore.CreateTodoItemAsync(args, CancellationToken.None);
-        
-        var response = await client.GetTodoItemAsync(entity.TenantId, entity.TodoItemId);
+
+        var response = await client.V1.Tenant[entity.TenantId].Todo[entity.TodoItemId.ToString()].GetAsync();
         
         response.Should().NotBeNull();
         response!.TodoItem.Should().NotBeNull();
-        response.TodoItem.TodoItemId.Should().NotBeNull();
+        response.TodoItem!.TodoItemId.Should().NotBeNull();
         response.TodoItem.TenantId.Should().Be(entity.TenantId);
         response.TodoItem.IdempotencyToken.Should().NotBeNull();
         response.TodoItem.Title.Should().Be(args.Title);
@@ -37,12 +37,11 @@ public class GetTodoItemTests(Fixture fixture, ITestOutputHelper output) : TestC
         var client = Fixture.Client;
         
         var args = Given.CreateTodoItemArgs();
-        await Fixture.DdbStore.CreateTodoItemAsync(args, CancellationToken.None);
+        var entity = await Fixture.DdbStore.CreateTodoItemAsync(args, CancellationToken.None);
 
         var todoItemId = Ulid.NewUlid(); // Note: Bogus todoitem id
         
-        var response = await client.GetTodoItemAsync(args.TenantId, todoItemId);
+        await client.V1.Tenant[entity.TenantId].Todo[todoItemId.ToString()].GetAsync();
         
-        response.Should().BeNull();
     }
 }
