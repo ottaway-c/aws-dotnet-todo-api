@@ -6,16 +6,16 @@ namespace Todo.Core.Entities;
 public class BaseEntity
 {
     [DynamoDbProperty(nameof(PK), DynamoDbAttributeType.PartitionKey)]
-    public required string PK { get; set; }
+    public required string PK { get; init; }
 
     [DynamoDbProperty(nameof(SK), DynamoDbAttributeType.SortKey)]
-    public required string SK { get; set; }
+    public required string SK { get; init; }
 
     [DynamoDbProperty(nameof(Entity))]
-    public virtual required string Entity { get; set; }
+    public virtual required string Entity { get; init; }
 
     [DynamoDbProperty(nameof(CreatedDate))]
-    public required DateTime CreatedDate { get; set; }
+    public required DateTime CreatedDate { get; init; }
 
     [DynamoDbProperty(nameof(UpdatedDate))]
     public required DateTime UpdatedDate { get; set; }

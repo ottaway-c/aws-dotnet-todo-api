@@ -171,3 +171,42 @@ npm run sso
 cdk destroy todo-api-feat-1008-app --profile todo-api
 cdk destroy todo-api-feat-1008-ecr --profile todo-api
 ```
+
+## Dotnet Tools
+
+I am are using CSharpier to format C# code
+
+Install CShariper and Kiota
+
+```
+dotnet tool restore
+```
+
+Upgrading Kiota
+
+```
+dotnet tool update microsoft.openapi.kiota
+```
+
+Upgrading CSharpier
+
+```
+dotnet tool update csharpier
+```
+
+Run formatter
+
+```
+
+npm run format
+```
+
+## API Client Generation
+
+I am generating the C# API client using code generation.
+
+Run the following command to build a client:
+
+```
+npm run gen-client
+```

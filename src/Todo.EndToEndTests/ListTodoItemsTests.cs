@@ -7,11 +7,10 @@ namespace Todo.EndToEndTests;
 public class ListTodoItemsTests(Fixture fixture, ITestOutputHelper output) : TestClass<Fixture>(fixture, output)
 {
     [Fact]
-    public async Task ListTodoItemsBasicOk()
+    public async Task ListTodoItemsBasic_Ok()
     {
+        var tenantId = Given.TenantId();
         var client = Fixture.Client;
-        
-        var tenantId = Ulid.NewUlid();
         
         int total = 10;
         
@@ -31,12 +30,12 @@ public class ListTodoItemsTests(Fixture fixture, ITestOutputHelper output) : Tes
         Func<Task> asyncRetry = async () =>
         {
             // Note: The default API behaviour is to return 25 records
-            var response = await client.ListTodoItemsAsync(tenantId);
+            var response = await client.V1.Tenant[tenantId].Todo.GetAsync();
             
             response.Should().NotBeNull();
-            response.TodoItems.Should().NotBeNull();
+            response!.TodoItems.Should().NotBeNull();
             
-            response.TodoItems.Count.Should().Be(total);
+            response.TodoItems!.Count.Should().Be(total);
             response.TodoItems.Should().OnlyHaveUniqueItems();
         };
         

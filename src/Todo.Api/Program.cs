@@ -2,7 +2,9 @@ using System.Text;
 using dotenv.net;
 using EfficientDynamoDb;
 using EfficientDynamoDb.Credentials.AWSSDK;
+using FastEndpoints.ClientGen.Kiota;
 using FastEndpoints.Swagger;
+using Kiota.Builder;
 using Serilog;
 using Todo.Core;
 
@@ -50,14 +52,16 @@ public class Program
         //
 
         builder.Services.AddAWSLambdaHosting(LambdaEventSource.RestApi);
+        builder.Services.AddExceptionHandler<ExceptionResponseHandler>();
         builder.Services.AddFastEndpoints();
         builder.Services.SwaggerDocument(x =>
         {
+            x.ShortSchemaNames = true;
             x.MaxEndpointVersion = 1;
             x.DocumentSettings = s =>
             {
                 s.Title = "Todo API";
-                s.DocumentName = "Initial Release";
+                s.DocumentName = "v1";
                 s.Version = "v1";
             };
         });
@@ -72,15 +76,37 @@ public class Program
         app.UseFastEndpoints(x =>
         {
             x.Versioning.Prefix = "v";
-            x.Versioning.DefaultVersion = 1;
             x.Versioning.PrependToRoute = true;
             x.Endpoints.ShortNames = true;
+            x.Endpoints.Configurator = ep =>
+            {
+                ep.DontCatchExceptions();
+                ep.PreProcessor<TenantIdChecker>(Order.Before);
+                
+                // Note: Obviously in a production scenario this API would be secured
+                // I've made it anonymous to keep things simple
+                ep.AllowAnonymous();
 
-            // Note: Obviously in a production scenario this API would be secured
-            // I've made it anonymous to keep things simple
-            x.Endpoints.Configurator = epd => epd.AllowAnonymous();
+                foreach (var route in ep.Routes)
+                {
+                    if (route is not ("" or "ping"))
+                    {
+                        ep.Description(b => b.Produces<ApiErrorResponse>(500));
+                    }
+                }
+            };
         });
+        
         app.UseSwaggerGen();
+        
+        await app.GenerateApiClientsAndExitAsync(cs =>
+        {
+            cs.Language = GenerationLanguage.CSharp;
+            cs.SwaggerDocumentName = "v1";
+            cs.OutputPath = "../Todo.Client";
+            cs.ClientNamespaceName = "Todo.Client";
+            cs.ClientClassName = "TodoClient";
+        });
         
         await app.RunAsync();
     }

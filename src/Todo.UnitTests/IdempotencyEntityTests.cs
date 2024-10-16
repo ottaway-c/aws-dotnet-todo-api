@@ -16,7 +16,7 @@ public class IdempotencyEntityTests
         entity.Should().NotBeNull();
         entity.TodoItemId.Should().BeEquivalentTo(todoItemEntity.TodoItemId);
         entity.IdempotencyToken.Should().BeEquivalentTo(args.IdempotencyToken);
-        entity.PK.Should().BeEquivalentTo($"IDEMPOTENCY#{args.IdempotencyToken}#TENANT#{entity.TenantId}");
+        entity.PK.Should().BeEquivalentTo($"TENANT#{entity.TenantId}#IDEMPOTENCY#{args.IdempotencyToken}");
         entity.SK.Should().Contain($"IDEMPOTENCY#{args.IdempotencyToken}");
         entity.IdempotencyToken.Should().BeEquivalentTo(args.IdempotencyToken);
         entity.Entity.Should().BeEquivalentTo("Idempotency");

@@ -1,7 +1,7 @@
 using System.Net;
 using FastEndpoints;
-using FastEndpoints.Testing;
 using FluentAssertions;
+using Todo.Api;
 using Todo.Api.Endpoints;
 using Xunit.Abstractions;
 
@@ -10,15 +10,15 @@ namespace Todo.IntegrationTests;
 public class UpdateTodoItemTests(Fixture fixture, ITestOutputHelper output) : TestBase<Fixture>(fixture, output)
 {
     [Fact]
-    public async Task UpdateTodoItemOk()
+    public async Task UpdateTodoItem_Ok()
     {
         var args = Given.CreateTodoItemArgs();
         var entity = await Fixture.DdbStore.CreateTodoItemAsync(args, CancellationToken.None);
 
         var request = Given.UpdateTodoItemRequest(entity.TenantId, entity.TodoItemId);
-        var (apiResponse, response) = await Fixture.Client.PUTAsync<UpdateTodoItemEndpoint, UpdateTodoItemRequest, UpdateTodoItemResponse>(request);
+        var (httpResponse, response) = await Fixture.Client.PUTAsync<UpdateTodoItemEndpoint, UpdateTodoItemRequest, UpdateTodoItemResponse>(request);
         
-        apiResponse.StatusCode.Should().Be(HttpStatusCode.OK);
+        httpResponse.StatusCode.Should().Be(HttpStatusCode.OK);
 
         response.Should().NotBeNull();
         response!.TodoItem.Should().NotBeNull();
@@ -31,29 +31,33 @@ public class UpdateTodoItemTests(Fixture fixture, ITestOutputHelper output) : Te
     }
     
     [Fact]
-    public async Task UpdateTodoItemNotFound()
+    public async Task UpdateTodoItem_NotFound()
     {
-        var args = Given.CreateTodoItemArgs();
-        var entity = await Fixture.DdbStore.CreateTodoItemAsync(args, CancellationToken.None);
+        var tenantId = Given.TenantId();
+        var todoItemId = Ulid.NewUlid();  // Note: TodoItem does not exist
         
-        var request = Given.UpdateTodoItemRequest(entity.TenantId, Ulid.NewUlid()); // Note: TodoItem does not exist
-        var apiResponse = await Fixture.Client.PUTAsync<UpdateTodoItemEndpoint, UpdateTodoItemRequest>(request);
+        var request = Given.UpdateTodoItemRequest(tenantId, todoItemId);
+        var (httpResponse, response) = await Fixture.Client.PUTAsync<UpdateTodoItemEndpoint, UpdateTodoItemRequest, ApiErrorResponse>(request);
         
-        apiResponse.StatusCode.Should().Be(HttpStatusCode.NotFound);
+        httpResponse.StatusCode.Should().Be(HttpStatusCode.NotFound);
+        response.Should().NotBeNull();
     }
     
     [Fact]
-    public async Task UpdateTodoItemValidationFailure()
+    public async Task UpdateTodoItem_ValidationFailure()
     {
-        var request = Given.UpdateTodoItemRequest(Ulid.NewUlid(), Ulid.NewUlid());
+        var tenantId = Given.TenantId();
+        var todoItemId = Ulid.NewUlid();
+        
+        var request = Given.UpdateTodoItemRequest(tenantId, todoItemId);
         request.TodoItemId = null; // Note: Invalidate
 
-        var (apiResponse, response) = await Fixture.Client.PUTAsync<UpdateTodoItemEndpoint, UpdateTodoItemRequest, ErrorResponse>(request);
+        var (httpResponse, response) = await Fixture.Client.PUTAsync<UpdateTodoItemEndpoint, UpdateTodoItemRequest, ApiErrorResponse>(request);
         
-        apiResponse.StatusCode.Should().Be(HttpStatusCode.BadRequest);
-        
+        httpResponse.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         response.Should().NotBeNull();
-        response!.StatusCode.Should().Be((int)HttpStatusCode.BadRequest);
+        response.StatusCode.Should().Be((int)HttpStatusCode.BadRequest);
+        response.ErrorCode.Should().Be("ValidationError");
         response.Errors.Should().HaveCount(1);
     }
 }

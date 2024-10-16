@@ -2,6 +2,7 @@ using System.Net;
 using FastEndpoints;
 using FastEndpoints.Testing;
 using FluentAssertions;
+using Todo.Api;
 using Todo.Api.Endpoints;
 using Xunit.Abstractions;
 
@@ -10,15 +11,15 @@ namespace Todo.IntegrationTests;
 public class DeleteTodoItemTests(Fixture fixture, ITestOutputHelper output) : TestBase<Fixture>(fixture, output)
 {
     [Fact]
-    public async Task DeleteTodoItemOk()
+    public async Task DeleteTodoItem_Ok()
     {
         var args = Given.CreateTodoItemArgs();
         var entity = await Fixture.DdbStore.CreateTodoItemAsync(args, CancellationToken.None);
 
         var request = Given.DeleteTodoItemRequest(entity.TenantId, entity.TodoItemId);
-        var apiResponse = await Fixture.Client.DELETEAsync<DeleteTodoItemEndpoint, DeleteTodoItemRequest>(request);
+        var httpResponse = await Fixture.Client.DELETEAsync<DeleteTodoItemEndpoint, DeleteTodoItemRequest>(request);
         
-        apiResponse.StatusCode.Should().Be(HttpStatusCode.NoContent);
+        httpResponse.StatusCode.Should().Be(HttpStatusCode.NoContent);
 
         // Note:
         // Ensure the item is deleted from Dynamo
@@ -27,32 +28,37 @@ public class DeleteTodoItemTests(Fixture fixture, ITestOutputHelper output) : Te
     }
     
     [Fact]
-    public async Task DeleteTodoItemNotFound()
+    public async Task DeleteTodoItem_NotFound()
     {
-        var args = Given.CreateTodoItemArgs();
-        var entity = await Fixture.DdbStore.CreateTodoItemAsync(args, CancellationToken.None);
+        var tenantId = Given.TenantId();
+        var todoItemId = Ulid.NewUlid(); // Note: TodoItem does not exist
         
-        var request = Given.DeleteTodoItemRequest(entity.TenantId, Ulid.NewUlid()); // Note: TodoItem does not exist
-        var apiResponse = await Fixture.Client.DELETEAsync<DeleteTodoItemEndpoint, DeleteTodoItemRequest>(request);
+        var request = Given.DeleteTodoItemRequest(tenantId, todoItemId);
+        var (httpResponse, response) = await Fixture.Client.DELETEAsync<DeleteTodoItemEndpoint, DeleteTodoItemRequest, ApiErrorResponse>(request);
         
-        apiResponse.StatusCode.Should().Be(HttpStatusCode.NotFound);
+        httpResponse.StatusCode.Should().Be(HttpStatusCode.NotFound);
+
+        response.Should().NotBeNull();
+        response.StatusCode.Should().Be((int)HttpStatusCode.NotFound);
     }
     
     [Fact]
-    public async Task DeleteTodoItemValidationFailure()
+    public async Task DeleteTodoItem_ValidationFailure()
     {
+        var tenantId = Given.TenantId();
+        
         // Note: Missing TodoItemId
         var request = new DeleteTodoItemRequest
         {
-            TenantId = Ulid.NewUlid()
+            TenantId = tenantId
         }; 
 
-        var (apiResponse, response) = await Fixture.Client.DELETEAsync<DeleteTodoItemEndpoint, DeleteTodoItemRequest, ErrorResponse>(request);
+        var (httpResponse, response) = await Fixture.Client.DELETEAsync<DeleteTodoItemEndpoint, DeleteTodoItemRequest, ApiErrorResponse>(request);
         
-        apiResponse.StatusCode.Should().Be(HttpStatusCode.BadRequest);
-        
+        httpResponse.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         response.Should().NotBeNull();
-        response!.StatusCode.Should().Be((int)HttpStatusCode.BadRequest);
+        response.StatusCode.Should().Be((int)HttpStatusCode.BadRequest);
+        response.ErrorCode.Should().Be("ValidationError");
         response.Errors.Should().HaveCount(1);
     }
 }

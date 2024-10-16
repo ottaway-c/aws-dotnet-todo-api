@@ -3,6 +3,7 @@ using FastEndpoints;
 using FastEndpoints.Testing;
 using FluentAssertions;
 using FluentAssertions.Extensions;
+using Todo.Api;
 using Todo.Api.Endpoints;
 using Todo.Core;
 using Todo.Core.Entities;
@@ -13,10 +14,9 @@ namespace Todo.IntegrationTests;
 public class ListTodoItemsTest(Fixture fixture, ITestOutputHelper output) : TestBase<Fixture>(fixture, output)
 {
     [Fact]
-    public async Task ListTodoItemsBasicOk()
+    public async Task ListTodoItemsBasic_Ok()
     {
-        var tenantId = Ulid.NewUlid();
-        
+        var tenantId = Given.TenantId();
         int total = 10;
 
         var entities = new List<TodoItemEntity>();
@@ -44,9 +44,9 @@ public class ListTodoItemsTest(Fixture fixture, ITestOutputHelper output) : Test
         {
             // Note: The default API behaviour is to return 25 records
             var request = Given.ListTodoItemsRequest(tenantId);
-            var (apiResponse, response) = await Fixture.Client.GETAsync<ListTodoItemsEndpoint, ListTodoItemsRequest, ListTodoItemsResponse>(request);
+            var (httpResponse, response) = await Fixture.Client.GETAsync<ListTodoItemsEndpoint, ListTodoItemsRequest, ListTodoItemsResponse>(request);
 
-            apiResponse.StatusCode.Should().Be(HttpStatusCode.OK);
+            httpResponse.StatusCode.Should().Be(HttpStatusCode.OK);
             
             response.Should().NotBeNull();
             response!.TodoItems.Should().NotBeNull();
@@ -65,9 +65,9 @@ public class ListTodoItemsTest(Fixture fixture, ITestOutputHelper output) : Test
     }
     
     [Fact]
-    public async Task ListTodoItemsWithPaginationOk()
+    public async Task ListTodoItemsWithPagination_Ok()
     {
-        var tenantId = Ulid.NewUlid();
+        var tenantId = Given.TenantId();
         
         int total = 10;
         var limit = 4;
@@ -100,9 +100,9 @@ public class ListTodoItemsTest(Fixture fixture, ITestOutputHelper output) : Test
             do
             {
                 var request = Given.ListTodoItemsRequest(tenantId, limit: limit, paginationToken: paginationToken);
-                var (apiResponse, response) = await Fixture.Client.GETAsync<ListTodoItemsEndpoint, ListTodoItemsRequest, ListTodoItemsResponse>(request);
+                var (httpResponse, response) = await Fixture.Client.GETAsync<ListTodoItemsEndpoint, ListTodoItemsRequest, ListTodoItemsResponse>(request);
 
-                apiResponse.StatusCode.Should().Be(HttpStatusCode.OK);
+                httpResponse.StatusCode.Should().Be(HttpStatusCode.OK);
                 
                 response.Should().NotBeNull();
                 response!.TodoItems.Should().NotBeNull();
@@ -136,9 +136,9 @@ public class ListTodoItemsTest(Fixture fixture, ITestOutputHelper output) : Test
     }
     
      [Fact]
-    public async Task ListTodoItemsWithEmptyResponseOk()
+    public async Task ListTodoItemsWithEmptyResponse_Ok()
     {
-        var tenantId = Ulid.NewUlid();
+        var tenantId = Given.TenantId();
         
         var request = Given.ListTodoItemsRequest(tenantId);
         var (apiResponse, response) = await Fixture.Client.GETAsync<ListTodoItemsEndpoint, ListTodoItemsRequest, ListTodoItemsResponse>(request);
@@ -151,9 +151,9 @@ public class ListTodoItemsTest(Fixture fixture, ITestOutputHelper output) : Test
     }
     
     [Fact]
-    public async Task ListTodoItemsWithFilterOk()
+    public async Task ListTodoItemsWithFilter_Ok()
     {
-        var tenantId = Ulid.NewUlid();
+        var tenantId = Given.TenantId();
         
         int total = 10;
         var limit = 4;
@@ -201,12 +201,12 @@ public class ListTodoItemsTest(Fixture fixture, ITestOutputHelper output) : Test
             do
             {
                 var request = Given.ListTodoItemsRequest(tenantId, limit: limit, paginationToken: paginationToken, isCompleted: true);
-                var (apiResponse, response) = await Fixture.Client.GETAsync<ListTodoItemsEndpoint, ListTodoItemsRequest, ListTodoItemsResponse>(request);
+                var (httpResponse, response) = await Fixture.Client.GETAsync<ListTodoItemsEndpoint, ListTodoItemsRequest, ListTodoItemsResponse>(request);
 
-                apiResponse.StatusCode.Should().Be(HttpStatusCode.OK);
+                httpResponse.StatusCode.Should().Be(HttpStatusCode.OK);
                 
                 response.Should().NotBeNull();
-                response!.TodoItems.Should().NotBeNull();
+                response.TodoItems.Should().NotBeNull();
 
                 itemCount += response.TodoItems.Count;
                 
@@ -239,16 +239,17 @@ public class ListTodoItemsTest(Fixture fixture, ITestOutputHelper output) : Test
     }
     
     [Fact]
-    public async Task ListTodoItemsValidationFailure()
+    public async Task ListTodoItems_ValidationFailure()
     {
-        var tenantId = Ulid.NewUlid();
+        var tenantId = Given.TenantId();
         var request = Given.ListTodoItemsRequest(tenantId, limit: 51); // Note: Limit is outside the upper bound
-        var (apiResponse, response) = await Fixture.Client.GETAsync<ListTodoItemsEndpoint, ListTodoItemsRequest, ErrorResponse>(request);
-
-        apiResponse.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         
+        var (httpResponse, response) = await Fixture.Client.GETAsync<ListTodoItemsEndpoint, ListTodoItemsRequest, ApiErrorResponse>(request);
+
+        httpResponse.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         response.Should().NotBeNull();
-        response!.StatusCode.Should().Be((int)HttpStatusCode.BadRequest);
+        response.StatusCode.Should().Be((int)HttpStatusCode.BadRequest);
+        response.ErrorCode.Should().Be("ValidationError");
         response.Errors.Should().HaveCount(1);
     }
 }

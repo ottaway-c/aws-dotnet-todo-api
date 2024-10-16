@@ -1,4 +1,4 @@
-using Todo.Client;
+using Todo.Client.Models;
 using Todo.Core;
 
 namespace Todo.EndToEndTests;
@@ -10,8 +10,7 @@ public static class Given
         var request = new CreateTodoItemRequest
         {
             Title = Ulid.NewUlid().ToString(),
-            Notes = Ulid.NewUlid().ToString(),
-            TenantId = Ulid.NewUlid()
+            Notes = Ulid.NewUlid().ToString()
         };
 
         return request;
@@ -29,16 +28,23 @@ public static class Given
         return request;
     }
     
-    public static CreateTodoItemArgs CreateTodoItemArgs(Ulid? tenantId = null)
+    public static CreateTodoItemArgs CreateTodoItemArgs(string? tenantId = null)
     {
         var args = new CreateTodoItemArgs
         {
             Title = Ulid.NewUlid().ToString(),
             Notes = Ulid.NewUlid().ToString(),
-            TenantId = tenantId ?? Ulid.NewUlid(),
+            TenantId = tenantId ?? TenantId(),
             IdempotencyToken = Ulid.NewUlid()
         };
 
         return args;
+    }
+    
+    public static string TenantId()
+    {
+        var tenantId = Ulid.NewUlid().ToString().ToLower();
+
+        return tenantId;
     }
 }

@@ -9,16 +9,16 @@ namespace Todo.Core;
 
 public class CreateTodoItemArgs
 {
+    public required string TenantId { get; init; }
     public required string Title { get; init; }
     public required string Notes { get; init; }
-    public required Ulid TenantId { get; init; }
     public required Ulid IdempotencyToken { get; init; }
 }
 
 public class UpdateTodoItemArgs
 {
     public required Ulid TodoItemId { get; init; }
-    public required Ulid TenantId { get; init; }
+    public required string TenantId { get; init; }
     public required string Title { get; init; }
     public required string Notes { get; init; }
     public required bool IsCompleted { get; init; }
@@ -27,7 +27,7 @@ public class UpdateTodoItemArgs
 public class DeleteTodoItemArgs
 {
     public required Ulid TodoItemId { get; init; }
-    public required Ulid TenantId { get; init; }
+    public required string TenantId { get; init; }
 }
 
 public interface IDynamoDbStore
@@ -38,13 +38,15 @@ public interface IDynamoDbStore
 
     Task<bool> DeleteTodoItemAsync(DeleteTodoItemArgs args, CancellationToken ct);
 
-    Task<TodoItemEntity?> GetTodoItemAsync(Ulid tenantId, Ulid todoItemId, CancellationToken ct);
+    Task<TodoItemEntity?> GetTodoItemAsync(string tenantId, Ulid todoItemId, CancellationToken ct);
 
-    Task<PagedResult<TodoItemEntity>> ListTodoItemsAsync(Ulid tenantId, int limit, bool? isComplete = null, string? paginationToken = null);
+    Task<PagedResult<TodoItemEntity>> ListTodoItemsAsync(string tenantId, int limit, bool? isComplete = null, string? paginationToken = null);
 }
 
 public class DynamoDbStore(IDynamoDbContext ddb) : IDynamoDbStore
 {
+    private const string Gsi1IndexName = "GSI1";
+    
     public async Task<TodoItemEntity> CreateTodoItemAsync(CreateTodoItemArgs args, CancellationToken ct)
     {
         var entity = TodoItemEntity.Create(args);
@@ -87,8 +89,8 @@ public class DynamoDbStore(IDynamoDbContext ddb) : IDynamoDbStore
 
     public async Task<TodoItemEntity?> UpdateTodoItemAsync(UpdateTodoItemArgs args, CancellationToken ct)
     {
-        var pk = $"TENANT#{args.TenantId}";
-        var sk = $"TODOITEM#{args.TodoItemId}";
+        var pk = TodoItemEntity.Pk(args.TenantId, args.TodoItemId);
+        var sk = TodoItemEntity.Sk(args.TodoItemId);
         var now = DateTime.UtcNow;
         
         var condition = Condition.ForEntity<TodoItemEntity>();
@@ -118,8 +120,8 @@ public class DynamoDbStore(IDynamoDbContext ddb) : IDynamoDbStore
 
     public async Task<bool> DeleteTodoItemAsync(DeleteTodoItemArgs args, CancellationToken ct)
     {
-        var pk = $"TENANT#{args.TenantId}";
-        var sk = $"TODOITEM#{args.TodoItemId}";
+        var pk = TodoItemEntity.Pk(args.TenantId, args.TodoItemId);
+        var sk = TodoItemEntity.Sk(args.TodoItemId);
         
         var condition = Condition.ForEntity<TodoItemEntity>();
         var expression = Joiner.And(condition.On(x => x.PK).Exists(),
@@ -141,25 +143,28 @@ public class DynamoDbStore(IDynamoDbContext ddb) : IDynamoDbStore
         }
     }
 
-    public async Task<TodoItemEntity?> GetTodoItemAsync(Ulid tenantId, Ulid todoItemId, CancellationToken ct)
+    public async Task<TodoItemEntity?> GetTodoItemAsync(string tenantId, Ulid todoItemId, CancellationToken ct)
     {
-        var pk = $"TENANT#{tenantId}";
-        var sk = $"TODOITEM#{todoItemId}";
+        var pk = TodoItemEntity.Pk(tenantId, todoItemId);
+        var sk = TodoItemEntity.Sk(todoItemId);
         
         var entity = await ddb.GetItemAsync<TodoItemEntity>(pk, sk, ct);
 
         return entity;
     }
 
-    public async Task<PagedResult<TodoItemEntity>> ListTodoItemsAsync(Ulid tenantId, int limit, bool? isComplete = null, string? paginationToken = null)
+    public async Task<PagedResult<TodoItemEntity>> ListTodoItemsAsync(string tenantId, int limit, bool? isComplete = null, string? paginationToken = null)
     {
+        var gs1Pk = TodoItemEntity.Gsi1Pk(tenantId);
+        
         var keyCondition = Condition.ForEntity<TodoItemEntity>();
         var keyExpression = Joiner.And(
-            keyCondition.On(x => x.PK).EqualTo($"TENANT#{tenantId}"),
-            keyCondition.On(x => x.SK).BeginsWith("TODOITEM#")
+            keyCondition.On(x => x.GSI1PK).EqualTo(gs1Pk),
+            keyCondition.On(x => x.GSI1SK).BeginsWith("TODOITEM#")
         );
 
         var query = ddb.Query<TodoItemEntity>()
+            .FromIndex(Gsi1IndexName)
             .WithKeyExpression(keyExpression)
             .WithLimit(limit)
             .BackwardSearch(true) // Note: (ScanIndexForward = false)

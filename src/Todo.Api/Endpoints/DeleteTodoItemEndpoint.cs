@@ -1,52 +1,47 @@
-using System.ComponentModel;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Todo.Core;
 
 namespace Todo.Api.Endpoints;
 
-public class DeleteTodoItemRequest
+public class DeleteTodoItemRequest : ITenantId
 {
-    [DefaultValue(Constants.DefaultTodoItemId)]
+    public string? TenantId { get; set; }
     public Ulid? TodoItemId { get; set; }
-    
-    [DefaultValue(Constants.DefaultTenantId)]
-    public Ulid? TenantId { get; set; }
 }
 
 public class DeleteTodoItemRequestValidator : Validator<DeleteTodoItemRequest>
 {
     public DeleteTodoItemRequestValidator()
     {
+        RuleFor(x => x.TenantId).NotEmpty();
         RuleFor(x => x.TodoItemId).NotNull();
-        RuleFor(x => x.TenantId).NotNull();
     }
 }
 
-public class DeleteTodoItemEndpoint(IDynamoDbStore ddbStore, Mapper mapper) : Endpoint<DeleteTodoItemRequest, NoContent>
+public class DeleteTodoItemEndpoint(IDynamoDbStore ddbStore, Mapper mapper) : Endpoint<DeleteTodoItemRequest, Results<NoContent, NotFound<ApiErrorResponse>>>
 {
     public override void Configure()
     {
-        Delete("/api/{TenantId}/todo/{TodoItemId}");
-        Description(x => x.Produces(404));
-        Description(x => x.ProducesProblemFE<InternalErrorResponse>(500));
+        Delete("tenant/{TenantId}/todo/{TodoItemId}");
+        Version(1);
         Summary(s =>
         {
             s.Summary = "Delete TodoItem";
             s.Description = "Delete a TodoItem";
-            s.RequestParam(r => r.TodoItemId!, "TodoItem Id");
-            s.RequestParam(r => r.TenantId!, "Tenant Id");
         });
         Validator<DeleteTodoItemRequestValidator>();
     }
-    
-    public override async Task HandleAsync(DeleteTodoItemRequest request, CancellationToken ct)
+
+    public override async Task<Results<NoContent, NotFound<ApiErrorResponse>>> ExecuteAsync(DeleteTodoItemRequest request, CancellationToken ct)
     {
         var args = mapper.DeleteTodoItemRequestToArgs(request);
         var result = await ddbStore.DeleteTodoItemAsync(args, ct);
 
         if (!result)
         {
-            await SendNotFoundAsync(ct);
+            return TypedResults.NotFound(ApiErrorResponse.NotFound());
         }
+
+        return TypedResults.NoContent();
     }
 }

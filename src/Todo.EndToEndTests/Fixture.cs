@@ -5,6 +5,8 @@ using Amazon.APIGateway.Model;
 using dotenv.net;
 using EfficientDynamoDb;
 using EfficientDynamoDb.Credentials.AWSSDK;
+using Microsoft.Kiota.Abstractions.Authentication;
+using Microsoft.Kiota.Http.HttpClientLibrary;
 using Todo.Client;
 using Todo.Core;
 
@@ -13,7 +15,7 @@ namespace Todo.EndToEndTests;
 public class Fixture : TestFixture
 {
     public required IDynamoDbStore DdbStore { get; set; }
-    public required ITodoClient Client { get; set; }
+    public required TodoClient Client { get; set; }
 
     protected override async Task SetupAsync()
     {
@@ -42,7 +44,9 @@ public class Fixture : TestFixture
         // Note:
         // Perform service discovery to find our deployed API URL
         var apiGatewayUrl = await apiGateway.GetApiGatewayUrlAsync(service, stage, region);
-        Client = new TodoClient(new HttpClient(), apiGatewayUrl);
+        
+        var adapter = new HttpClientRequestAdapter(new AnonymousAuthenticationProvider()) { BaseUrl = apiGatewayUrl.ToString() };
+        Client = new TodoClient(adapter);
     }
 }
 

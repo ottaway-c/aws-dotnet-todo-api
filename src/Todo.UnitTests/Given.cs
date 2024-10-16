@@ -12,7 +12,7 @@ public static class Given
         {
             Title = Ulid.NewUlid().ToString(),
             Notes = Ulid.NewUlid().ToString(),
-            TenantId = Ulid.NewUlid(),
+            TenantId = Ulid.NewUlid().ToString(),
             IdempotencyToken = Ulid.NewUlid()
         };
 
@@ -24,7 +24,7 @@ public static class Given
         var request = new UpdateTodoItemRequest
         {
             TodoItemId = Ulid.NewUlid(),
-            TenantId = Ulid.NewUlid(),
+            TenantId = Ulid.NewUlid().ToString(),
             Title = Ulid.NewUlid().ToString(),
             Notes = Ulid.NewUlid().ToString(),
             IsCompleted = true
@@ -38,7 +38,7 @@ public static class Given
         var request = new DeleteTodoItemRequest
         {
             TodoItemId = Ulid.NewUlid(),
-            TenantId = Ulid.NewUlid()
+            TenantId = Ulid.NewUlid().ToString()
         };
 
         return request;
@@ -49,7 +49,7 @@ public static class Given
         var request = new GetTodoItemRequest
         {
             TodoItemId = Ulid.NewUlid(),
-            TenantId = Ulid.NewUlid()
+            TenantId = Ulid.NewUlid().ToString()
         };
 
         return request;
@@ -59,7 +59,7 @@ public static class Given
     {
         var request = new ListTodoItemsRequest
         {
-            TenantId = Ulid.NewUlid(),
+            TenantId = Ulid.NewUlid().ToString(),
             Limit = 20,
             PaginationToken = Ulid.NewUlid().ToString(),
             IsCompleted = true
@@ -74,7 +74,7 @@ public static class Given
         {
             Title = Ulid.NewUlid().ToString(),
             Notes = Ulid.NewUlid().ToString(),
-            TenantId = Ulid.NewUlid(),
+            TenantId = Ulid.NewUlid().ToString(),
             IdempotencyToken = Ulid.NewUlid()
         };
 
