@@ -2,8 +2,6 @@ using System.Text;
 using Amazon;
 using Amazon.APIGateway;
 using Amazon.APIGateway.Model;
-using Amazon.Runtime;
-using Amazon.Runtime.CredentialManagement;
 using dotenv.net;
 using EfficientDynamoDb;
 using EfficientDynamoDb.Credentials.AWSSDK;
@@ -12,64 +10,40 @@ using Todo.Core;
 
 namespace Todo.EndToEndTests;
 
-public class Fixture
+public class Fixture : TestFixture
 {
-    public required IDynamoDbStore DdbStore { get; init; }
-    public required ITodoClient Client { get; init; }
+    public required IDynamoDbStore DdbStore { get; set; }
+    public required ITodoClient Client { get; set; }
 
-    public static async Task<Fixture> Ensure() => await _factory;
-
-    private static readonly AsyncLazy<Fixture> _factory = new(async () =>
+    protected override async Task SetupAsync()
     {
-        DotEnv.Fluent()
-            .WithTrimValues()
-            .WithEncoding(Encoding.UTF8)
-            .WithOverwriteExistingVars()
-            .WithProbeForEnv(8)
-            .Load();
+        DotEnv.Fluent().WithTrimValues().WithEncoding(Encoding.UTF8).WithOverwriteExistingVars().WithProbeForEnv(8).Load();
+        
+        var credentials = Env.GetAwsCredentials("todo-api");
+        var region = Env.GetRegion();
+        var regionEndpoint = RegionEndpoint.GetBySystemName(region);
         
         var service = Env.GetString("SERVICE");
         var stage = Env.GetString("STAGE");
-        var region = Env.GetString("CDK_DEFAULT_REGION");
-
-        var chain = new CredentialProfileStoreChain();
-        IAmazonAPIGateway apiGateway;
         
-        if (chain.TryGetAWSCredentials("todo-api", out var credentials))
-        {
-            // Running locally
-            apiGateway = new AmazonAPIGatewayClient(credentials, RegionEndpoint.GetBySystemName(region));
-        }
-        else
-        {
-            // Running in Github actions
-            credentials = FallbackCredentialsFactory.GetCredentials();
-            apiGateway = new AmazonAPIGatewayClient();
-        }
-
         var provider = new AWSCredentialsProvider(credentials);
         
         var tableNamePrefix = $"{service}-{stage}-app-";
-        var regionEndpoint = EfficientDynamoDb.Configs.RegionEndpoint.Create(region);
-        var config = new DynamoDbContextConfig(regionEndpoint, provider)
+        var config = new DynamoDbContextConfig(EfficientDynamoDb.Configs.RegionEndpoint.Create(region), provider)
         {
             TableNamePrefix = tableNamePrefix
         };
         
         var ddb = new DynamoDbContext(config);
-        var ddbStore = new DynamoDbStore(ddb);
+        DdbStore = new DynamoDbStore(ddb);
+        
+        var apiGateway = new AmazonAPIGatewayClient(credentials, regionEndpoint);
         
         // Note:
         // Perform service discovery to find our deployed API URL
         var apiGatewayUrl = await apiGateway.GetApiGatewayUrlAsync(service, stage, region);
-        var client = new TodoClient(new HttpClient(), apiGatewayUrl);
-
-        return new Fixture
-        {
-            DdbStore = ddbStore,
-            Client = client
-        };
-    });
+        Client = new TodoClient(new HttpClient(), apiGatewayUrl);
+    }
 }
 
 public static class ApiGatewayExtensions

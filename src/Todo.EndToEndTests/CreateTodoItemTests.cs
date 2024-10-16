@@ -1,14 +1,14 @@
 using FluentAssertions;
+using Xunit.Abstractions;
 
 namespace Todo.EndToEndTests;
 
-public class CreateTodoItemTests
+public class CreateTodoItemTests(Fixture fixture, ITestOutputHelper output) : TestClass<Fixture>(fixture, output)
 {
     [Fact]
     public async Task CreateTodoItemOk()
     {
-        var fixture = await Fixture.Ensure();
-        var client = fixture.Client;
+        var client = Fixture.Client;
         
         var now = DateTime.UtcNow;
         

@@ -1,17 +1,17 @@
 using FluentAssertions;
+using Xunit.Abstractions;
 
 namespace Todo.EndToEndTests;
 
-public class DeleteTodoItemTests
+public class DeleteTodoItemTests(Fixture fixture, ITestOutputHelper output) : TestClass<Fixture>(fixture, output)
 {
     [Fact]
     public async Task DeleteTodoItemOk()
     {
-        var fixture = await Fixture.Ensure();
-        var client = fixture.Client;
+        var client = Fixture.Client;
         
         var args = Given.CreateTodoItemArgs();
-        var entity = await fixture.DdbStore.CreateTodoItemAsync(args, CancellationToken.None);
+        var entity = await Fixture.DdbStore.CreateTodoItemAsync(args, CancellationToken.None);
         
         var response = await client.DeleteTodoItemAsync(entity.TenantId, entity.TodoItemId);
         response.Should().BeTrue();
@@ -20,11 +20,10 @@ public class DeleteTodoItemTests
     [Fact]
     public async Task DeleteTodoItemNotFound()
     {
-        var fixture = await Fixture.Ensure();
-        var client = fixture.Client;
+        var client = Fixture.Client;
         
         var args = Given.CreateTodoItemArgs();
-        await fixture.DdbStore.CreateTodoItemAsync(args, CancellationToken.None);
+        await Fixture.DdbStore.CreateTodoItemAsync(args, CancellationToken.None);
         
         var todoItemId = Ulid.NewUlid(); // Note: Bogus todoitem id
 
