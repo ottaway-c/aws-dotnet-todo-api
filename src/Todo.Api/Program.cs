@@ -81,6 +81,7 @@ public class Program
             x.Endpoints.Configurator = epd => epd.AllowAnonymous();
         });
         app.UseSwaggerGen();
+        
         await app.RunAsync();
     }
 }
