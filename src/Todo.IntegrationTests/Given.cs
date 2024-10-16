@@ -62,7 +62,7 @@ public static class Given
         {
             Title = Ulid.NewUlid().ToString(),
             Notes = Ulid.NewUlid().ToString(),
-            TenantId = tenantId ?? Ulid.NewUlid().ToString(),
+            TenantId = tenantId ?? TenantId(),
             IdempotencyToken = Ulid.NewUlid()
         };
 
@@ -78,5 +78,12 @@ public static class Given
         };
     
         return request;
+    }
+
+    public static string TenantId()
+    {
+        var tenantId = Ulid.NewUlid().ToString().ToLower();
+
+        return tenantId;
     }
 }

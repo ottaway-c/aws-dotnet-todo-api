@@ -9,9 +9,9 @@ namespace Todo.Core;
 
 public class CreateTodoItemArgs
 {
+    public required string TenantId { get; init; }
     public required string Title { get; init; }
     public required string Notes { get; init; }
-    public required string TenantId { get; init; }
     public required Ulid IdempotencyToken { get; init; }
 }
 
@@ -27,7 +27,7 @@ public class UpdateTodoItemArgs
 public class DeleteTodoItemArgs
 {
     public required Ulid TodoItemId { get; init; }
-    public required Ulid TenantId { get; init; }
+    public required string TenantId { get; init; }
 }
 
 public interface IDynamoDbStore
