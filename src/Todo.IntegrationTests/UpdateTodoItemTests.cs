@@ -45,7 +45,7 @@ public class UpdateTodoItemTests(Fixture fixture, ITestOutputHelper output) : Te
     [Fact]
     public async Task UpdateTodoItemValidationFailure()
     {
-        var request = Given.UpdateTodoItemRequest(Ulid.NewUlid(), Ulid.NewUlid());
+        var request = Given.UpdateTodoItemRequest(Ulid.NewUlid().ToString(), Ulid.NewUlid());
         request.TodoItemId = null; // Note: Invalidate
 
         var (apiResponse, response) = await Fixture.Client.PUTAsync<UpdateTodoItemEndpoint, UpdateTodoItemRequest, ErrorResponse>(request);

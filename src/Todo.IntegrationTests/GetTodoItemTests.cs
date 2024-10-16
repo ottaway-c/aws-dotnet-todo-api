@@ -45,7 +45,7 @@ public class GetTodoItemTests(Fixture fixture, ITestOutputHelper output) : TestB
         // Note: Missing TodoItemId
         var request = new GetTodoItemRequest
         {
-            TenantId = Ulid.NewUlid()
+            TenantId = Ulid.NewUlid().ToString()
         }; 
 
         var (apiResponse, response) = await Fixture.Client.GETAsync<GetTodoItemEndpoint, GetTodoItemRequest, ErrorResponse>(request);

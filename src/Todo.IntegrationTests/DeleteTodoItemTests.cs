@@ -44,7 +44,7 @@ public class DeleteTodoItemTests(Fixture fixture, ITestOutputHelper output) : Te
         // Note: Missing TodoItemId
         var request = new DeleteTodoItemRequest
         {
-            TenantId = Ulid.NewUlid()
+            TenantId = Ulid.NewUlid().ToString()
         }; 
 
         var (apiResponse, response) = await Fixture.Client.DELETEAsync<DeleteTodoItemEndpoint, DeleteTodoItemRequest, ErrorResponse>(request);

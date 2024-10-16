@@ -1,67 +1,60 @@
-using System.ComponentModel;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Todo.Core;
 
 namespace Todo.Api.Endpoints;
 
-public class ListTodoItemsRequest
+public class ListTodoItemsRequest : ITenantId
 {
-    [DefaultValue(Constants.DefaultTenantId)]
-    public Ulid? TenantId { get; set; }
-    
-    [DefaultValue(25)]
+    public string? TenantId { get; set; }
     public int? Limit { get; set; }
-    
-    [DefaultValue("")]
     public string? PaginationToken { get; set; }
-    
     public bool? IsCompleted { get; set; }
 }
 
 public class ListTodoItemsResponse
 {
-    public List<TodoItemDto> TodoItems { get; set; } = new();
-    public string? PaginationToken { get; set; }
+    public required List<TodoItemDto> TodoItems { get; init; }
+    public required string? PaginationToken { get; init; }
 }
 
 public class ListTodoItemsRequestValidator : Validator<ListTodoItemsRequest>
 {
     public ListTodoItemsRequestValidator()
     {
-        RuleFor(x => x.TenantId).NotNull();
+        RuleFor(x => x.TenantId).NotEmpty();
         RuleFor(x => x.Limit).GreaterThanOrEqualTo(1).LessThanOrEqualTo(50);
     }
 }
 
 public class ListTodoItemsEndpoint(IDynamoDbStore ddbStore, Mapper mapper)
-    : Endpoint<ListTodoItemsRequest, ListTodoItemsResponse>
+    : Endpoint<ListTodoItemsRequest, Ok<ListTodoItemsResponse>>
 {
     public override void Configure()
     {
-        Get("/api/{TenantId}/todo");
-        Description(x => x.ProducesProblemFE<InternalErrorResponse>(500));
+        Get("tenant/{TenantId}/todo");
+        Version(1);
         Summary(s =>
         {
             s.Summary = "List TodoItems";
             s.Description = "List and filter TodoItems";
-            s.RequestParam(r => r.TenantId!, "Tenant Id");
-            s.RequestParam(r => r.Limit!, "The maximum number of items to return in a single query. Optional, the default is 25");
-            s.RequestParam(r => r.PaginationToken!, "The pagination token containing the next range of results. Optional");
-            s.RequestParam(r => r.IsCompleted!, "Flag to filter on completed/non completed items. Optional");
             
         });
         Validator<ListTodoItemsRequestValidator>();
     }
-    
-    public override async Task HandleAsync(ListTodoItemsRequest request, CancellationToken ct)
+
+    public override async Task<Ok<ListTodoItemsResponse>> ExecuteAsync(ListTodoItemsRequest request, CancellationToken ct)
     {
         // Note: Assign a default limit if the request does not contain one
         request.Limit ??= 25;
         
-        var page = await ddbStore.ListTodoItemsAsync(request.TenantId!.Value, request.Limit.Value, request.IsCompleted, request.PaginationToken);
-        if (!page.Items.Any())
+        var page = await ddbStore.ListTodoItemsAsync(request.TenantId!, request.Limit.Value, request.IsCompleted, request.PaginationToken);
+        if (page.Items.Count == 0)
         {
-            Response.TodoItems = new List<TodoItemDto>();
-            return;
+            return TypedResults.Ok(new ListTodoItemsResponse
+            {
+                TodoItems = [],
+                PaginationToken = null
+            });
         }
         
         var items = page.Items.Select(x =>
@@ -70,7 +63,12 @@ public class ListTodoItemsEndpoint(IDynamoDbStore ddbStore, Mapper mapper)
             return todoItem;
         }).ToList();
 
-        Response.TodoItems = items;
-        Response.PaginationToken = page.PaginationToken;
+        var response = new ListTodoItemsResponse
+        {
+            TodoItems = items,
+            PaginationToken = page.PaginationToken
+        };
+
+        return TypedResults.Ok(response);
     }
 }

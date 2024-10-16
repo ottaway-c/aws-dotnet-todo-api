@@ -1,0 +1,14 @@
+{
+  "version": 1,
+  "isRoot": true,
+  "tools": {
+    "csharpier": {
+      "version": "0.28.1",
+      "commands": ["dotnet-csharpier"]
+    },
+    "microsoft.openapi.kiota": {
+      "version": "1.19.1",
+      "commands": ["kiota"]
+    }
+  }
+}

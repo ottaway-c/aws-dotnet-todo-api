@@ -13,7 +13,7 @@ public class TodoItemEntityTests
         {
             Title = "Put out the washing",
             Notes = "Reminder: Clothes are still in the machine!",
-            TenantId = Ulid.NewUlid(),
+            TenantId = Ulid.NewUlid().ToString(),
             IdempotencyToken = Ulid.NewUlid()
         };
 

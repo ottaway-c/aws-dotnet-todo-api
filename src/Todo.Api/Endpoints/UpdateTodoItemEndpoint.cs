@@ -1,37 +1,28 @@
-using System.ComponentModel;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Todo.Core;
 
 namespace Todo.Api.Endpoints;
 
-public class UpdateTodoItemRequest
+public class UpdateTodoItemRequest : ITenantId
 {
-    [DefaultValue(Constants.DefaultTodoItemId)]
+    public string? TenantId { get; set; }
     public Ulid? TodoItemId { get; set; }
-    
-    [DefaultValue(Constants.DefaultTenantId)]
-    public Ulid? TenantId { get; set; }
-    
-    [DefaultValue(Constants.DefaultTitle)]
     public string? Title { get; set; }
-    
-    [DefaultValue(Constants.DefaultNotes)]
     public string? Notes { get; set; }
-    
-    [DefaultValue(true)]
     public bool? IsCompleted { get; set; }
 }
 
 public class UpdateTodoItemResponse
 {
-    public TodoItemDto? TodoItem { get; set; }
+    public required TodoItemDto TodoItem { get; init; }
 }
 
 public class UpdateTodoItemRequestValidator : Validator<UpdateTodoItemRequest>
 {
     public UpdateTodoItemRequestValidator()
     {
+        RuleFor(x => x.TenantId).NotEmpty();
         RuleFor(x => x.TodoItemId).NotNull();
-        RuleFor(x => x.TenantId).NotNull();
         RuleFor(x => x.Title).NotEmpty().MinimumLength(3).MaximumLength(100);
         RuleFor(x => x.Notes).NotEmpty().MinimumLength(3).MaximumLength(100);
         RuleFor(x => x.IsCompleted).NotNull();
@@ -39,37 +30,38 @@ public class UpdateTodoItemRequestValidator : Validator<UpdateTodoItemRequest>
 }
 
 public class UpdateTodoItemEndpoint(IDynamoDbStore ddbStore, Mapper mapper)
-    : Endpoint<UpdateTodoItemRequest, UpdateTodoItemResponse>
+    : Endpoint<UpdateTodoItemRequest, Results<Ok<UpdateTodoItemResponse>, NotFound<ApiErrorResponse>>>
 {
     public override void Configure()
     {
-        Put("/api/{TenantId}/todo/{TodoItemId}");
-        Description(x => x.Produces(404));
-        Description(x => x.ProducesProblemFE<InternalErrorResponse>(500));
+        Put("tenant/{TenantId}/todo/{TodoItemId}");
+        Version(1);
         Summary(s =>
         {
             s.Summary = "Update TodoItem";
             s.Description = "Update a TodoItem";
-            s.RequestParam(r => r.TenantId!, "Tenant Id");
-            s.RequestParam(r => r.TodoItemId!, "TodoItem Id");
             
         });
         Validator<UpdateTodoItemRequestValidator>();
     }
-    
-    public override async Task HandleAsync(UpdateTodoItemRequest request, CancellationToken ct)
+
+    public override async Task<Results<Ok<UpdateTodoItemResponse>, NotFound<ApiErrorResponse>>> ExecuteAsync(UpdateTodoItemRequest request, CancellationToken ct)
     {
         var args = mapper.UpdateTodoItemRequestToArgs(request);
         var entity = await ddbStore.UpdateTodoItemAsync(args, ct);
     
         if (entity == null)
         {
-            await SendNotFoundAsync(ct);
-            return;
+            return TypedResults.NotFound(ApiErrorResponse.NotFound());
         }
     
         var todoItemDto = mapper.TodoItemEntityToDto(entity);
 
-        Response.TodoItem = todoItemDto;
+        var response = new UpdateTodoItemResponse
+        {
+            TodoItem = todoItemDto
+        };
+
+        return TypedResults.Ok(response);
     }
 }

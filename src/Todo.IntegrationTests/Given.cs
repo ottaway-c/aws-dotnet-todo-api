@@ -5,7 +5,7 @@ namespace Todo.IntegrationTests;
 
 public static class Given
 {
-    public static CreateTodoItemRequest CreateTodoItemRequest(Ulid tenantId, Ulid? idempotencyToken = null)
+    public static CreateTodoItemRequest CreateTodoItemRequest(string tenantId, Ulid? idempotencyToken = null)
     {
         var request = new CreateTodoItemRequest
         {
@@ -18,7 +18,7 @@ public static class Given
         return request;
     }
 
-    public static UpdateTodoItemRequest UpdateTodoItemRequest(Ulid tenantId, Ulid todoItemId)
+    public static UpdateTodoItemRequest UpdateTodoItemRequest(string tenantId, Ulid todoItemId)
     {
         var request = new UpdateTodoItemRequest
         {
@@ -32,7 +32,7 @@ public static class Given
         return request;
     }
     
-    public static GetTodoItemRequest GetTodoItemRequest(Ulid tenantId, Ulid todoItemId)
+    public static GetTodoItemRequest GetTodoItemRequest(string tenantId, Ulid todoItemId)
     {
         var request = new GetTodoItemRequest
         {
@@ -43,7 +43,7 @@ public static class Given
         return request;
     }
 
-    public static ListTodoItemsRequest ListTodoItemsRequest(Ulid tenantId, int? limit = null, string? paginationToken = null, bool? isCompleted = false)
+    public static ListTodoItemsRequest ListTodoItemsRequest(string tenantId, int? limit = null, string? paginationToken = null, bool? isCompleted = false)
     {
         var request = new ListTodoItemsRequest
         {
@@ -56,27 +56,27 @@ public static class Given
         return request;
     }
     
-    public static CreateTodoItemArgs CreateTodoItemArgs(Ulid? tenantId = null)
+    public static CreateTodoItemArgs CreateTodoItemArgs(string? tenantId = null)
     {
         var args = new CreateTodoItemArgs
         {
             Title = Ulid.NewUlid().ToString(),
             Notes = Ulid.NewUlid().ToString(),
-            TenantId = tenantId ?? Ulid.NewUlid(),
+            TenantId = tenantId ?? Ulid.NewUlid().ToString(),
             IdempotencyToken = Ulid.NewUlid()
         };
 
         return args;
     }
 
-    public static DeleteTodoItemRequest DeleteTodoItemRequest(Ulid tenantId, Ulid todoItemId)
+    public static DeleteTodoItemRequest DeleteTodoItemRequest(string tenantId, Ulid todoItemId)
     {
         var request = new DeleteTodoItemRequest
         {
             TodoItemId = todoItemId,
             TenantId = tenantId
         };
-
+    
         return request;
     }
 }

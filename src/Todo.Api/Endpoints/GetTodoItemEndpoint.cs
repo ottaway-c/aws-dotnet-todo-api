@@ -1,61 +1,59 @@
-﻿using System.ComponentModel;
+﻿using Microsoft.AspNetCore.Http.HttpResults;
 using Todo.Core;
 
 namespace Todo.Api.Endpoints;
 
-public class GetTodoItemRequest
+public class GetTodoItemRequest : ITenantId
 {
-    [DefaultValue(Constants.DefaultTodoItemId)]
+    public string? TenantId { get; set; }
     public Ulid? TodoItemId { get; set; }
-    
-    [DefaultValue(Constants.DefaultTenantId)]
-    public Ulid? TenantId { get; set; }
 }
 
 public class GetTodoItemResponse
 {
-    public TodoItemDto? TodoItem { get; set; }
+    public required TodoItemDto TodoItem { get; init; }
 }
 
 public class GetTodoItemRequestValidator : Validator<GetTodoItemRequest>
 {
     public GetTodoItemRequestValidator()
     {
+        RuleFor(x => x.TenantId).NotEmpty();
         RuleFor(x => x.TodoItemId).NotNull();
-        RuleFor(x => x.TenantId).NotNull();
     }
 }
 
 public class GetTodoItemEndpoint(IDynamoDbStore ddbStore, Mapper mapper)
-    : Endpoint<GetTodoItemRequest, GetTodoItemResponse>
+    : Endpoint<GetTodoItemRequest, Results<Ok<GetTodoItemResponse>, NotFound<ApiErrorResponse>>>
 {
     public override void Configure()
     {
-        Get("/api/{TenantId}/todo/{TodoItemId}");
-        Description(x => x.Produces(404));
-        Description(x => x.ProducesProblemFE<InternalErrorResponse>(500));
+        Get("tenant/{TenantId}/todo/{TodoItemId}");
+        Version(1);
         Summary(s =>
         {
             s.Summary = "Get TodoItem";
             s.Description = "Get a TodoItem";
-            s.RequestParam(r => r.TodoItemId!, "TodoItem Id");
-            s.RequestParam(r => r.TenantId!, "Tenant Id");
         });
         Validator<GetTodoItemRequestValidator>();
     }
-    
-    public override async Task HandleAsync(GetTodoItemRequest request, CancellationToken ct)
+
+    public override async Task<Results<Ok<GetTodoItemResponse>, NotFound<ApiErrorResponse>>> ExecuteAsync(GetTodoItemRequest request, CancellationToken ct)
     {
-        var entity = await ddbStore.GetTodoItemAsync(request.TenantId!.Value, request.TodoItemId!.Value, ct);
+        var entity = await ddbStore.GetTodoItemAsync(request.TenantId!, request.TodoItemId!.Value, ct);
         
         if (entity == null)
         {
-            await SendNotFoundAsync(ct);
-            return;
+            return TypedResults.NotFound(ApiErrorResponse.NotFound());
         }
         
         var todoItemDto = mapper.TodoItemEntityToDto(entity);
 
-        Response.TodoItem = todoItemDto;
+        var response = new GetTodoItemResponse
+        {
+            TodoItem = todoItemDto
+        };
+
+        return TypedResults.Ok(response);
     }
 }

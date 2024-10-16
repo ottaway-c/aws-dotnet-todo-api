@@ -10,7 +10,7 @@ public class TodoItemDto
 
     public required bool IsCompleted { get; set; }
     
-    public required Ulid TenantId { get; set; }
+    public required string TenantId { get; set; }
     
     public required Ulid IdempotencyToken { get; set; }
     

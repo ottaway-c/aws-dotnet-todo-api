@@ -7,8 +7,8 @@ public class IdempotencyEntity : BaseEntity
     [DynamoDbProperty(nameof(TodoItemId), typeof(UlidConverter))]
     public required Ulid TodoItemId { get; set; }
     
-    [DynamoDbProperty(nameof(TenantId), typeof(UlidConverter))]
-    public required Ulid TenantId { get; set; }
+    [DynamoDbProperty(nameof(TenantId))]
+    public required string TenantId { get; set; }
     
     [DynamoDbProperty(nameof(IdempotencyToken), typeof(UlidConverter))]
     public required Ulid IdempotencyToken { get; set; }

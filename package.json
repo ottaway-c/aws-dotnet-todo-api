@@ -11,7 +11,9 @@
     "push": "docker compose -f docker-compose.yml push",
     "unit": "dotnet test ./src/Todo.UnitTests",
     "integration": "dotnet test ./src/Todo.IntegrationTests",
-    "e2e": "dotnet test ./src/Todo.EndToEndTests"
+    "e2e": "dotnet test ./src/Todo.EndToEndTests",
+    "format": "dotnet csharpier .",
+    "gen-client": "dotnet run --project ./src/Todo.Api --generateclients true"
   },
   "devDependencies": {
     "@types/node": "20.11.26",

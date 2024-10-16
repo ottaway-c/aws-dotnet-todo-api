@@ -4,6 +4,9 @@ namespace Todo.Core.Entities;
 
 public class TodoItemEntity : BaseEntity
 {
+    [DynamoDbProperty(nameof(TenantId))]
+    public required string TenantId { get; set; }
+    
     [DynamoDbProperty(nameof(TodoItemId), typeof(UlidConverter))]
     public required Ulid TodoItemId { get; init; }
     
@@ -15,9 +18,6 @@ public class TodoItemEntity : BaseEntity
     
     [DynamoDbProperty(nameof(IsCompleted))]
     public required bool IsCompleted { get; init; }
-    
-    [DynamoDbProperty(nameof(TenantId), typeof(UlidConverter))]
-    public required Ulid TenantId { get; set; }
     
     [DynamoDbProperty(nameof(IdempotencyToken), typeof(UlidConverter))]
     public required Ulid IdempotencyToken { get; set; }

@@ -15,7 +15,7 @@ public class ListTodoItemsTest(Fixture fixture, ITestOutputHelper output) : Test
     [Fact]
     public async Task ListTodoItemsBasicOk()
     {
-        var tenantId = Ulid.NewUlid();
+        var tenantId = Ulid.NewUlid().ToString();
         
         int total = 10;
 
@@ -67,7 +67,7 @@ public class ListTodoItemsTest(Fixture fixture, ITestOutputHelper output) : Test
     [Fact]
     public async Task ListTodoItemsWithPaginationOk()
     {
-        var tenantId = Ulid.NewUlid();
+        var tenantId = Ulid.NewUlid().ToString();
         
         int total = 10;
         var limit = 4;
@@ -138,7 +138,7 @@ public class ListTodoItemsTest(Fixture fixture, ITestOutputHelper output) : Test
      [Fact]
     public async Task ListTodoItemsWithEmptyResponseOk()
     {
-        var tenantId = Ulid.NewUlid();
+        var tenantId = Ulid.NewUlid().ToString();
         
         var request = Given.ListTodoItemsRequest(tenantId);
         var (apiResponse, response) = await Fixture.Client.GETAsync<ListTodoItemsEndpoint, ListTodoItemsRequest, ListTodoItemsResponse>(request);
@@ -153,7 +153,7 @@ public class ListTodoItemsTest(Fixture fixture, ITestOutputHelper output) : Test
     [Fact]
     public async Task ListTodoItemsWithFilterOk()
     {
-        var tenantId = Ulid.NewUlid();
+        var tenantId = Ulid.NewUlid().ToString();
         
         int total = 10;
         var limit = 4;
@@ -241,7 +241,7 @@ public class ListTodoItemsTest(Fixture fixture, ITestOutputHelper output) : Test
     [Fact]
     public async Task ListTodoItemsValidationFailure()
     {
-        var tenantId = Ulid.NewUlid();
+        var tenantId = Ulid.NewUlid().ToString();
         var request = Given.ListTodoItemsRequest(tenantId, limit: 51); // Note: Limit is outside the upper bound
         var (apiResponse, response) = await Fixture.Client.GETAsync<ListTodoItemsEndpoint, ListTodoItemsRequest, ErrorResponse>(request);
 

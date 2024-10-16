@@ -11,14 +11,14 @@ public class CreateTodoItemArgs
 {
     public required string Title { get; init; }
     public required string Notes { get; init; }
-    public required Ulid TenantId { get; init; }
+    public required string TenantId { get; init; }
     public required Ulid IdempotencyToken { get; init; }
 }
 
 public class UpdateTodoItemArgs
 {
     public required Ulid TodoItemId { get; init; }
-    public required Ulid TenantId { get; init; }
+    public required string TenantId { get; init; }
     public required string Title { get; init; }
     public required string Notes { get; init; }
     public required bool IsCompleted { get; init; }
@@ -38,9 +38,9 @@ public interface IDynamoDbStore
 
     Task<bool> DeleteTodoItemAsync(DeleteTodoItemArgs args, CancellationToken ct);
 
-    Task<TodoItemEntity?> GetTodoItemAsync(Ulid tenantId, Ulid todoItemId, CancellationToken ct);
+    Task<TodoItemEntity?> GetTodoItemAsync(string tenantId, Ulid todoItemId, CancellationToken ct);
 
-    Task<PagedResult<TodoItemEntity>> ListTodoItemsAsync(Ulid tenantId, int limit, bool? isComplete = null, string? paginationToken = null);
+    Task<PagedResult<TodoItemEntity>> ListTodoItemsAsync(string tenantId, int limit, bool? isComplete = null, string? paginationToken = null);
 }
 
 public class DynamoDbStore(IDynamoDbContext ddb) : IDynamoDbStore
@@ -141,7 +141,7 @@ public class DynamoDbStore(IDynamoDbContext ddb) : IDynamoDbStore
         }
     }
 
-    public async Task<TodoItemEntity?> GetTodoItemAsync(Ulid tenantId, Ulid todoItemId, CancellationToken ct)
+    public async Task<TodoItemEntity?> GetTodoItemAsync(string tenantId, Ulid todoItemId, CancellationToken ct)
     {
         var pk = $"TENANT#{tenantId}";
         var sk = $"TODOITEM#{todoItemId}";
@@ -151,7 +151,7 @@ public class DynamoDbStore(IDynamoDbContext ddb) : IDynamoDbStore
         return entity;
     }
 
-    public async Task<PagedResult<TodoItemEntity>> ListTodoItemsAsync(Ulid tenantId, int limit, bool? isComplete = null, string? paginationToken = null)
+    public async Task<PagedResult<TodoItemEntity>> ListTodoItemsAsync(string tenantId, int limit, bool? isComplete = null, string? paginationToken = null)
     {
         var keyCondition = Condition.ForEntity<TodoItemEntity>();
         var keyExpression = Joiner.And(

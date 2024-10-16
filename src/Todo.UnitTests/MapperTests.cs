@@ -21,7 +21,7 @@ public class MapperTests
             Title = "Put out the washing",
             Notes = "Reminder: Clothes are still in the machine!",
             IsCompleted = false,
-            TenantId = Ulid.NewUlid(),
+            TenantId = Ulid.NewUlid().ToString(),
             IdempotencyToken = Ulid.NewUlid(),
             CreatedDate = now,
             UpdatedDate = now,

@@ -12,7 +12,7 @@ public class CreateTodoItemTests(Fixture fixture, ITestOutputHelper output) : Te
     [Fact]
     public async Task CreateTodoItemOk()
     {
-        var request = Given.CreateTodoItemRequest(Ulid.NewUlid());
+        var request = Given.CreateTodoItemRequest(Ulid.NewUlid().ToString());
         
         var (apiResponse, response) = await Fixture.Client.POSTAsync<CreateTodoItemEndpoint, CreateTodoItemRequest, CreateTodoItemResponse>(request);
         
@@ -31,7 +31,7 @@ public class CreateTodoItemTests(Fixture fixture, ITestOutputHelper output) : Te
     [Fact]
     public async Task CreateTodoItemIdempotent()
     {
-        var request = Given.CreateTodoItemRequest(Ulid.NewUlid(), Ulid.NewUlid());
+        var request = Given.CreateTodoItemRequest(Ulid.NewUlid().ToString(), Ulid.NewUlid());
         
         var (apiResponse1, response1) = await Fixture.Client.POSTAsync<CreateTodoItemEndpoint, CreateTodoItemRequest, CreateTodoItemResponse>(request);
         
@@ -57,8 +57,7 @@ public class CreateTodoItemTests(Fixture fixture, ITestOutputHelper output) : Te
         // Note: Missing Title and Description
         var request = new CreateTodoItemRequest
         {
-            TenantId = Ulid.NewUlid()
-            
+            TenantId = Ulid.NewUlid().ToString()
         };
 
         var (apiResponse, response) = await Fixture.Client.POSTAsync<CreateTodoItemEndpoint, CreateTodoItemRequest, ErrorResponse>(request);
