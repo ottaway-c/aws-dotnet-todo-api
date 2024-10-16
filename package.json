@@ -4,8 +4,8 @@
   "scripts": {
     "cdk": "cdk",
     "sso": "aws sso login --profile todo-api",
-    "build": "docker-compose -f docker-compose.yml build",
-    "push": "docker-compose -f docker-compose.yml push",
+    "build": "docker compose -f docker-compose.yml build",
+    "push": "docker compose -f docker-compose.yml push",
     "unit": "dotnet test ./src/Todo.UnitTests",
     "integration": "dotnet test ./src/Todo.IntegrationTests",
     "e2e": "dotnet test ./src/Todo.EndToEndTests"
