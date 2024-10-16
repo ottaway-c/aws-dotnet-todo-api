@@ -6,15 +6,15 @@ namespace Todo.EndToEndTests;
 public class CreateTodoItemTests(Fixture fixture, ITestOutputHelper output) : TestClass<Fixture>(fixture, output)
 {
     [Fact]
-    public async Task CreateTodoItemOk()
+    public async Task CreateTodoItem_Ok()
     {
+        var tenantId = Given.TenantId();
         var client = Fixture.Client;
-        var tenantId = Ulid.NewUlid();
         
         var now = DateTime.UtcNow;
         
         var request = Given.CreateTodoItemRequest();
-        var response = await client.V1.Tenant[tenantId.ToString()].Todo.PostAsync(request);
+        var response = await client.V1.Tenant[tenantId].Todo.PostAsync(request);
         
         response.Should().NotBeNull();
         response!.TodoItem.Should().NotBeNull();

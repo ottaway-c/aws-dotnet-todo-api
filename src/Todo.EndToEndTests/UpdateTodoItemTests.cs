@@ -6,17 +6,18 @@ namespace Todo.EndToEndTests;
 public class UpdateTodoItemTests(Fixture fixture, ITestOutputHelper output) : TestClass<Fixture>(fixture, output)
 {
     [Fact]
-    public async Task UpdateTodoItemOk()
+    public async Task UpdateTodoItem_Ok()
     {
+        var tenantId = Given.TenantId();
         var client = Fixture.Client;
         
         var now = DateTime.UtcNow;
         
-        var args = Given.CreateTodoItemArgs();
+        var args = Given.CreateTodoItemArgs(tenantId);
         var entity = await Fixture.DdbStore.CreateTodoItemAsync(args, CancellationToken.None);
 
         var request = Given.UpdateTodoItemRequest();
-        var response = await client.V1.Tenant[entity.TenantId].Todo[entity.TodoItemId.ToString()].PutAsync(request);
+        var response = await client.V1.Tenant[tenantId].Todo[entity.TodoItemId.ToString()].PutAsync(request);
         
         response.Should().NotBeNull();
         response!.TodoItem.Should().NotBeNull();

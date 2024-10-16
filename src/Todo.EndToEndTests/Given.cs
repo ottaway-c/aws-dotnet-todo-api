@@ -1,4 +1,3 @@
-using Todo.Client;
 using Todo.Client.Models;
 using Todo.Core;
 
@@ -35,10 +34,17 @@ public static class Given
         {
             Title = Ulid.NewUlid().ToString(),
             Notes = Ulid.NewUlid().ToString(),
-            TenantId = tenantId ?? Ulid.NewUlid().ToString(),
+            TenantId = tenantId ?? TenantId(),
             IdempotencyToken = Ulid.NewUlid()
         };
 
         return args;
+    }
+    
+    public static string TenantId()
+    {
+        var tenantId = Ulid.NewUlid().ToString().ToLower();
+
+        return tenantId;
     }
 }
