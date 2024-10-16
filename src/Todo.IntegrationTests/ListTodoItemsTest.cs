@@ -10,12 +10,8 @@ using Xunit.Abstractions;
 
 namespace Todo.IntegrationTests;
 
-public class ListTodoItemsTest : TestClass<Fixture>
+public class ListTodoItemsTest(Fixture fixture, ITestOutputHelper output) : TestBase<Fixture>(fixture, output)
 {
-    public ListTodoItemsTest(Fixture fixture, ITestOutputHelper output) : base(fixture, output)
-    {
-    }
-
     [Fact]
     public async Task ListTodoItemsBasicOk()
     {

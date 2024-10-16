@@ -22,17 +22,8 @@ public class DeleteTodoItemRequestValidator : Validator<DeleteTodoItemRequest>
     }
 }
 
-public class DeleteTodoItemEndpoint : Endpoint<DeleteTodoItemRequest, NoContent>
+public class DeleteTodoItemEndpoint(IDynamoDbStore ddbStore, Mapper mapper) : Endpoint<DeleteTodoItemRequest, NoContent>
 {
-    private readonly IDynamoDbStore _ddbStore;
-    private readonly Mapper _mapper;
-
-    public DeleteTodoItemEndpoint(IDynamoDbStore ddbStore)
-    {
-        _ddbStore = ddbStore;
-        _mapper = new();
-    }
-    
     public override void Configure()
     {
         Delete("/api/{TenantId}/todo/{TodoItemId}");
@@ -50,8 +41,8 @@ public class DeleteTodoItemEndpoint : Endpoint<DeleteTodoItemRequest, NoContent>
     
     public override async Task HandleAsync(DeleteTodoItemRequest request, CancellationToken ct)
     {
-        var args = _mapper.DeleteTodoItemRequestToArgs(request);
-        var result = await _ddbStore.DeleteTodoItemAsync(args, ct);
+        var args = mapper.DeleteTodoItemRequestToArgs(request);
+        var result = await ddbStore.DeleteTodoItemAsync(args, ct);
 
         if (!result)
         {

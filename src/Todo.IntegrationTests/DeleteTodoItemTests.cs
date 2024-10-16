@@ -7,12 +7,8 @@ using Xunit.Abstractions;
 
 namespace Todo.IntegrationTests;
 
-public class DeleteTodoItemTests : TestClass<Fixture>
+public class DeleteTodoItemTests(Fixture fixture, ITestOutputHelper output) : TestBase<Fixture>(fixture, output)
 {
-    public DeleteTodoItemTests(Fixture fixture, ITestOutputHelper output) : base(fixture, output)
-    {
-    }
-
     [Fact]
     public async Task DeleteTodoItemOk()
     {

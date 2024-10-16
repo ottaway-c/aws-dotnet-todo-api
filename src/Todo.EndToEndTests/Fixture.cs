@@ -35,7 +35,7 @@ public class Fixture
         var chain = new CredentialProfileStoreChain();
         IAmazonAPIGateway apiGateway;
         
-        if (chain.TryGetAWSCredentials("clearpoint-api", out var credentials))
+        if (chain.TryGetAWSCredentials("todo-api", out var credentials))
         {
             // Running locally
             apiGateway = new AmazonAPIGatewayClient(credentials, RegionEndpoint.GetBySystemName(region));

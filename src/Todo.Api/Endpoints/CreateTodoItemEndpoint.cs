@@ -33,17 +33,9 @@ public class CreateTodoItemRequestValidator : Validator<CreateTodoItemRequest>
     }
 }
 
-public class CreateTodoItemEndpoint : Endpoint<CreateTodoItemRequest, CreateTodoItemResponse>
+public class CreateTodoItemEndpoint(IDynamoDbStore ddb, Mapper mapper)
+    : Endpoint<CreateTodoItemRequest, CreateTodoItemResponse>
 {
-    private readonly IDynamoDbStore _ddb;
-    private readonly Mapper _mapper;
-
-    public CreateTodoItemEndpoint(IDynamoDbStore ddb)
-    {
-        _ddb = ddb;
-        _mapper = new Mapper();
-    }
-    
     public override void Configure()
     {
         Post("/api/{TenantId}/todo/");
@@ -62,9 +54,9 @@ public class CreateTodoItemEndpoint : Endpoint<CreateTodoItemRequest, CreateTodo
         // Note: Assign an idempotency token if the request does not contain one
         request.IdempotencyToken ??= Ulid.NewUlid();
 
-        var args = _mapper.CreateTodoItemRequestToArgs(request);
-        var entity = await _ddb.CreateTodoItemAsync(args, ct);
+        var args = mapper.CreateTodoItemRequestToArgs(request);
+        var entity = await ddb.CreateTodoItemAsync(args, ct);
         
-        Response.TodoItem = _mapper.TodoItemEntityToDto(entity);
+        Response.TodoItem = mapper.TodoItemEntityToDto(entity);
     }
 }

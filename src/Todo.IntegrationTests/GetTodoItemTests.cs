@@ -7,12 +7,8 @@ using Xunit.Abstractions;
 
 namespace Todo.IntegrationTests;
 
-public class GetTodoItemTests : TestClass<Fixture>
+public class GetTodoItemTests(Fixture fixture, ITestOutputHelper output) : TestBase<Fixture>(fixture, output)
 {
-    public GetTodoItemTests(Fixture fixture, ITestOutputHelper output) : base(fixture, output)
-    {
-    }
-
     [Fact]
     public async Task GetTodoItemOk()
     {

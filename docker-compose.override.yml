@@ -16,25 +16,24 @@ services:
       - /var/run:/var/run
       # Mount the shared configuration directory, used by the AWS CLI and AWS SDKs
       # On Windows, this directory can be found at "%UserProfile%\.aws"
-      - $AWS_CONFIGURATION_DIRECTORY:/home/.aws/
+      - ~/.aws:/home/.aws/
     environment:
-      AWS_CONFIGURATION_DIRECTORY: $AWS_CONFIGURATION_DIRECTORY
       AWS_PROFILE: $AWS_PROFILE
     networks:
       credentials_network:
         # This special IP address is recognized by the AWS SDKs and AWS CLI
         ipv4_address: "169.254.170.2"
-        
+
   todo-api:
     depends_on:
       - ecs-local-endpoints
     networks:
       credentials_network:
         ipv4_address: "169.254.170.3"
-    # Note: 
+    # Note:
     # We have to override the entrypoint to allow the debugger to attach to the container
     # The standard lambda entrypoint is not compatible with debugging
-    entrypoint: ["dotnet",  "Todo.Api.dll"]
+    entrypoint: ["dotnet", "Todo.Api.dll"]
     environment:
       AWS_DEFAULT_REGION: $CDK_DEFAULT_REGION
       AWS_REGION: $CDK_DEFAULT_REGION
@@ -42,4 +41,4 @@ services:
       AWS_CONTAINER_CREDENTIALS_RELATIVE_URI: "/creds"
       SERVICE: $SERVICE
       STAGE: $STAGE
-      PORT: "80"
+      ASPNETCORE_URLS: http://localhost:8080/

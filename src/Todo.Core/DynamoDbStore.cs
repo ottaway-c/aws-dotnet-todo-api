@@ -43,15 +43,8 @@ public interface IDynamoDbStore
     Task<PagedResult<TodoItemEntity>> ListTodoItemsAsync(Ulid tenantId, int limit, bool? isComplete = null, string? paginationToken = null);
 }
 
-public class DynamoDbStore : IDynamoDbStore
+public class DynamoDbStore(IDynamoDbContext ddb) : IDynamoDbStore
 {
-    private readonly IDynamoDbContext _ddb;
-
-    public DynamoDbStore(IDynamoDbContext ddb)
-    {
-        _ddb = ddb;
-    }
-    
     public async Task<TodoItemEntity> CreateTodoItemAsync(CreateTodoItemArgs args, CancellationToken ct)
     {
         var entity = TodoItemEntity.Create(args);
@@ -62,7 +55,7 @@ public class DynamoDbStore : IDynamoDbStore
 
         try
         {
-            await _ddb.TransactWrite().WithItems(
+            await ddb.TransactWrite().WithItems(
                 Transact.PutItem(entity).WithCondition(entityFilterExpression),
                 Transact.PutItem(idempotencyEntity)
                     .WithCondition(idempotencyEntityFilterExpression)
@@ -80,7 +73,7 @@ public class DynamoDbStore : IDynamoDbStore
                 // E.g in this case we need to look at the second item in the array, as we expect the idempotency check to have failed.
                 // From there we can extract the PK/SK of the TodoItem entity associated with the idempotency token, and return it.
                 var document = ex.CancellationReasons[1].Item;
-                var duplicateEntity = _ddb.ToObject<IdempotencyEntity>(document!);
+                var duplicateEntity = ddb.ToObject<IdempotencyEntity>(document!);
 
                 entity = await GetTodoItemAsync(duplicateEntity.TenantId, duplicateEntity.TodoItemId, ct);
                 if (entity == null) throw new InvalidOperationException("Failed to find duplicate TodoItem entity");
@@ -104,7 +97,7 @@ public class DynamoDbStore : IDynamoDbStore
 
         try
         {
-            var entity = await _ddb.UpdateItem<TodoItemEntity>()
+            var entity = await ddb.UpdateItem<TodoItemEntity>()
                 .WithPrimaryKey(pk, sk)
                 .WithCondition(expression)
                 .On(x => x.Title).Assign(args.Title)
@@ -134,7 +127,7 @@ public class DynamoDbStore : IDynamoDbStore
         
         try
         {
-            await _ddb.DeleteItem<TodoItemEntity>()
+            await ddb.DeleteItem<TodoItemEntity>()
                 .WithPrimaryKey(pk, sk)
                 .WithCondition(expression)
                 .ExecuteAsync(ct);
@@ -153,7 +146,7 @@ public class DynamoDbStore : IDynamoDbStore
         var pk = $"TENANT#{tenantId}";
         var sk = $"TODOITEM#{todoItemId}";
         
-        var entity = await _ddb.GetItemAsync<TodoItemEntity>(pk, sk, ct);
+        var entity = await ddb.GetItemAsync<TodoItemEntity>(pk, sk, ct);
 
         return entity;
     }
@@ -166,7 +159,7 @@ public class DynamoDbStore : IDynamoDbStore
             keyCondition.On(x => x.SK).BeginsWith("TODOITEM#")
         );
 
-        var query = _ddb.Query<TodoItemEntity>()
+        var query = ddb.Query<TodoItemEntity>()
             .WithKeyExpression(keyExpression)
             .WithLimit(limit)
             .BackwardSearch(true) // Note: (ScanIndexForward = false)

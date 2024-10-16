@@ -38,17 +38,9 @@ public class UpdateTodoItemRequestValidator : Validator<UpdateTodoItemRequest>
     }
 }
 
-public class UpdateTodoItemEndpoint : Endpoint<UpdateTodoItemRequest, UpdateTodoItemResponse>
+public class UpdateTodoItemEndpoint(IDynamoDbStore ddbStore, Mapper mapper)
+    : Endpoint<UpdateTodoItemRequest, UpdateTodoItemResponse>
 {
-    private readonly IDynamoDbStore _ddbStore;
-    private readonly Mapper _mapper;
-    
-    public UpdateTodoItemEndpoint(IDynamoDbStore ddbStore)
-    {
-        _ddbStore = ddbStore;
-        _mapper = new Mapper();
-    }
-    
     public override void Configure()
     {
         Put("/api/{TenantId}/todo/{TodoItemId}");
@@ -67,8 +59,8 @@ public class UpdateTodoItemEndpoint : Endpoint<UpdateTodoItemRequest, UpdateTodo
     
     public override async Task HandleAsync(UpdateTodoItemRequest request, CancellationToken ct)
     {
-        var args = _mapper.UpdateTodoItemRequestToArgs(request);
-        var entity = await _ddbStore.UpdateTodoItemAsync(args, ct);
+        var args = mapper.UpdateTodoItemRequestToArgs(request);
+        var entity = await ddbStore.UpdateTodoItemAsync(args, ct);
     
         if (entity == null)
         {
@@ -76,7 +68,7 @@ public class UpdateTodoItemEndpoint : Endpoint<UpdateTodoItemRequest, UpdateTodo
             return;
         }
     
-        var todoItemDto = _mapper.TodoItemEntityToDto(entity);
+        var todoItemDto = mapper.TodoItemEntityToDto(entity);
 
         Response.TodoItem = todoItemDto;
     }
