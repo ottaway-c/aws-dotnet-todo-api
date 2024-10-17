@@ -358,6 +358,58 @@
         }
       }
     },
+    "/v1/tenant/{tenantId}/cat": {
+      "get": {
+        "tags": [
+          "Tenant"
+        ],
+        "summary": "Get a Cat",
+        "description": "Returns a friendly cat",
+        "operationId": "GetCatEndpoint",
+        "parameters": [
+          {
+            "name": "tenantId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetCatResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/": {
       "get": {
         "operationId": "PingEndpoint1",
@@ -531,6 +583,19 @@
         }
       },
       "DeleteTodoItemRequest": {
+        "type": "object",
+        "additionalProperties": false
+      },
+      "GetCatResponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "meow": {
+            "type": "string"
+          }
+        }
+      },
+      "GetCatRequest": {
         "type": "object",
         "additionalProperties": false
       },

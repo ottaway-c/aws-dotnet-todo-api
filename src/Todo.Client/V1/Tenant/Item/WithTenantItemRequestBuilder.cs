@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using System;
+using Todo.Client.V1.Tenant.Item.Cat;
 using Todo.Client.V1.Tenant.Item.Todo;
 namespace Todo.Client.V1.Tenant.Item
 {
@@ -15,6 +16,11 @@ namespace Todo.Client.V1.Tenant.Item
     [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.18.0")]
     public partial class WithTenantItemRequestBuilder : BaseRequestBuilder
     {
+        /// <summary>The cat property</summary>
+        public global::Todo.Client.V1.Tenant.Item.Cat.CatRequestBuilder Cat
+        {
+            get => new global::Todo.Client.V1.Tenant.Item.Cat.CatRequestBuilder(PathParameters, RequestAdapter);
+        }
         /// <summary>The todo property</summary>
         public global::Todo.Client.V1.Tenant.Item.Todo.TodoRequestBuilder Todo
         {
