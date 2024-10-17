@@ -40,27 +40,26 @@ public class UpdateTodoItemEndpoint(IDynamoDbStore ddbStore, Mapper mapper)
         {
             s.Summary = "Update TodoItem";
             s.Description = "Update a TodoItem";
-            
         });
         Validator<UpdateTodoItemRequestValidator>();
     }
 
-    public override async Task<Results<Ok<UpdateTodoItemResponse>, NotFound<ApiErrorResponse>>> ExecuteAsync(UpdateTodoItemRequest request, CancellationToken ct)
+    public override async Task<Results<Ok<UpdateTodoItemResponse>, NotFound<ApiErrorResponse>>> ExecuteAsync(
+        UpdateTodoItemRequest request,
+        CancellationToken ct
+    )
     {
         var args = mapper.UpdateTodoItemRequestToArgs(request);
         var entity = await ddbStore.UpdateTodoItemAsync(args, ct);
-    
+
         if (entity == null)
         {
             return TypedResults.NotFound(ApiErrorResponse.NotFound());
         }
-    
+
         var todoItemDto = mapper.TodoItemEntityToDto(entity);
 
-        var response = new UpdateTodoItemResponse
-        {
-            TodoItem = todoItemDto
-        };
+        var response = new UpdateTodoItemResponse { TodoItem = todoItemDto };
 
         return TypedResults.Ok(response);
     }

@@ -11,9 +11,9 @@ public class ListTodoItemsTests(Fixture fixture, ITestOutputHelper output) : Tes
     {
         var tenantId = Given.TenantId();
         var client = Fixture.Client;
-        
+
         int total = 10;
-        
+
         {
             for (var i = 0; i < total; i++)
             {
@@ -26,19 +26,19 @@ public class ListTodoItemsTests(Fixture fixture, ITestOutputHelper output) : Tes
             var args = Given.CreateTodoItemArgs(); // Note: Different Tenant Id
             await Fixture.DdbStore.CreateTodoItemAsync(args, CancellationToken.None);
         }
-        
+
         Func<Task> asyncRetry = async () =>
         {
             // Note: The default API behaviour is to return 25 records
             var response = await client.V1.Tenant[tenantId].Todo.GetAsync();
-            
+
             response.Should().NotBeNull();
             response!.TodoItems.Should().NotBeNull();
-            
+
             response.TodoItems!.Count.Should().Be(total);
             response.TodoItems.Should().OnlyHaveUniqueItems();
         };
-        
+
         await asyncRetry.Should().NotThrowAfterAsync(waitTime: 5.Seconds(), pollInterval: 1.Seconds());
     }
 }

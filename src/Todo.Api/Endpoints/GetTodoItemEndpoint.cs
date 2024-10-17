@@ -41,17 +41,14 @@ public class GetTodoItemEndpoint(IDynamoDbStore ddbStore, Mapper mapper)
     public override async Task<Results<Ok<GetTodoItemResponse>, NotFound<ApiErrorResponse>>> ExecuteAsync(GetTodoItemRequest request, CancellationToken ct)
     {
         var entity = await ddbStore.GetTodoItemAsync(request.TenantId!, request.TodoItemId!.Value, ct);
-        
+
         if (entity == null)
         {
             return TypedResults.NotFound(ApiErrorResponse.NotFound());
         }
-        
+
         var todoItemDto = mapper.TodoItemEntityToDto(entity);
-        var response = new GetTodoItemResponse
-        {
-            TodoItem = todoItemDto
-        };
+        var response = new GetTodoItemResponse { TodoItem = todoItemDto };
 
         return TypedResults.Ok(response);
     }

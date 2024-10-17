@@ -9,9 +9,11 @@ namespace Todo.Api;
 public partial class Mapper
 {
     public partial CreateTodoItemArgs CreateTodoItemRequestToArgs(CreateTodoItemRequest request);
+
     public partial UpdateTodoItemArgs UpdateTodoItemRequestToArgs(UpdateTodoItemRequest request);
+
     public partial DeleteTodoItemArgs DeleteTodoItemRequestToArgs(DeleteTodoItemRequest request);
-    
+
     [MapperIgnoreSource(nameof(TodoItemEntity.PK))]
     [MapperIgnoreSource(nameof(TodoItemEntity.SK))]
     [MapperIgnoreSource(nameof(TodoItemEntity.GSI1PK))]

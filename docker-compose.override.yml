@@ -18,7 +18,7 @@ services:
       # On Windows, this directory can be found at "%UserProfile%\.aws"
       - ~/.aws:/home/.aws/
     environment:
-      AWS_PROFILE: $AWS_PROFILE
+      AWS_PROFILE: todo-api
     networks:
       credentials_network:
         # This special IP address is recognized by the AWS SDKs and AWS CLI

@@ -10,20 +10,20 @@ public class DeleteTodoItemTests(Fixture fixture, ITestOutputHelper output) : Te
     {
         var tenantId = Given.TenantId();
         var client = Fixture.Client;
-        
+
         var args = Given.CreateTodoItemArgs(tenantId);
         var entity = await Fixture.DdbStore.CreateTodoItemAsync(args, CancellationToken.None);
 
         await client.V1.Tenant[tenantId].Todo[entity.TodoItemId.ToString()].DeleteAsync();
     }
-    
+
     [Fact]
     public async Task DeleteTodoItem_NotFound()
     {
         var tenantId = Given.TenantId();
         var todoItemId = Ulid.NewUlid(); // Note: Bogus todoitem id
         var client = Fixture.Client;
-        
+
         await Assert.ThrowsAsync<ApiErrorResponse>(async () => await client.V1.Tenant[tenantId].Todo[todoItemId.ToString()].DeleteAsync());
     }
 }

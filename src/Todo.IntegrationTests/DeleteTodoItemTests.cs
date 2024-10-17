@@ -18,7 +18,7 @@ public class DeleteTodoItemTests(Fixture fixture, ITestOutputHelper output) : Te
 
         var request = Given.DeleteTodoItemRequest(entity.TenantId, entity.TodoItemId);
         var httpResponse = await Fixture.Client.DELETEAsync<DeleteTodoItemEndpoint, DeleteTodoItemRequest>(request);
-        
+
         httpResponse.StatusCode.Should().Be(HttpStatusCode.NoContent);
 
         // Note:
@@ -26,35 +26,32 @@ public class DeleteTodoItemTests(Fixture fixture, ITestOutputHelper output) : Te
         entity = await Fixture.DdbStore.GetTodoItemAsync(entity.TenantId, entity.TodoItemId, CancellationToken.None);
         entity.Should().BeNull();
     }
-    
+
     [Fact]
     public async Task DeleteTodoItem_NotFound()
     {
         var tenantId = Given.TenantId();
         var todoItemId = Ulid.NewUlid(); // Note: TodoItem does not exist
-        
+
         var request = Given.DeleteTodoItemRequest(tenantId, todoItemId);
         var (httpResponse, response) = await Fixture.Client.DELETEAsync<DeleteTodoItemEndpoint, DeleteTodoItemRequest, ApiErrorResponse>(request);
-        
+
         httpResponse.StatusCode.Should().Be(HttpStatusCode.NotFound);
 
         response.Should().NotBeNull();
         response.StatusCode.Should().Be((int)HttpStatusCode.NotFound);
     }
-    
+
     [Fact]
     public async Task DeleteTodoItem_ValidationFailure()
     {
         var tenantId = Given.TenantId();
-        
+
         // Note: Missing TodoItemId
-        var request = new DeleteTodoItemRequest
-        {
-            TenantId = tenantId
-        }; 
+        var request = new DeleteTodoItemRequest { TenantId = tenantId };
 
         var (httpResponse, response) = await Fixture.Client.DELETEAsync<DeleteTodoItemEndpoint, DeleteTodoItemRequest, ApiErrorResponse>(request);
-        
+
         httpResponse.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         response.Should().NotBeNull();
         response.StatusCode.Should().Be((int)HttpStatusCode.BadRequest);

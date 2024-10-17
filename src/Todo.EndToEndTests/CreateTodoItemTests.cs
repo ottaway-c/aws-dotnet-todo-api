@@ -10,12 +10,12 @@ public class CreateTodoItemTests(Fixture fixture, ITestOutputHelper output) : Te
     {
         var tenantId = Given.TenantId();
         var client = Fixture.Client;
-        
+
         var now = DateTime.UtcNow;
-        
+
         var request = Given.CreateTodoItemRequest();
         var response = await client.V1.Tenant[tenantId].Todo.PostAsync(request);
-        
+
         response.Should().NotBeNull();
         response!.TodoItem.Should().NotBeNull();
         response.TodoItem!.TodoItemId.Should().NotBeNull();
@@ -24,7 +24,7 @@ public class CreateTodoItemTests(Fixture fixture, ITestOutputHelper output) : Te
         response.TodoItem.Title.Should().Be(request.Title);
         response.TodoItem.Notes.Should().Be(request.Notes);
         response.TodoItem.IsCompleted.Should().BeFalse();
-        
+
         // NOTE: Allow for some variation in the clock skew.
         response.TodoItem.CreatedDate.Should().BeCloseTo(now, TimeSpan.FromMinutes(2));
         response.TodoItem.UpdatedDate.Should().BeCloseTo(now, TimeSpan.FromMinutes(2));

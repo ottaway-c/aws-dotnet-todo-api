@@ -46,7 +46,7 @@ public interface IDynamoDbStore
 public class DynamoDbStore(IDynamoDbContext ddb) : IDynamoDbStore
 {
     private const string Gsi1IndexName = "GSI1";
-    
+
     public async Task<TodoItemEntity> CreateTodoItemAsync(CreateTodoItemArgs args, CancellationToken ct)
     {
         var entity = TodoItemEntity.Create(args);
@@ -57,12 +57,15 @@ public class DynamoDbStore(IDynamoDbContext ddb) : IDynamoDbStore
 
         try
         {
-            await ddb.TransactWrite().WithItems(
-                Transact.PutItem(entity).WithCondition(entityFilterExpression),
-                Transact.PutItem(idempotencyEntity)
-                    .WithCondition(idempotencyEntityFilterExpression)
-                    .WithReturnValuesOnConditionCheckFailure(ReturnValuesOnConditionCheckFailure.AllOld)
-            ).ExecuteAsync(ct);
+            await ddb.TransactWrite()
+                .WithItems(
+                    Transact.PutItem(entity).WithCondition(entityFilterExpression),
+                    Transact
+                        .PutItem(idempotencyEntity)
+                        .WithCondition(idempotencyEntityFilterExpression)
+                        .WithReturnValuesOnConditionCheckFailure(ReturnValuesOnConditionCheckFailure.AllOld)
+                )
+                .ExecuteAsync(ct);
 
             return entity;
         }
@@ -78,8 +81,9 @@ public class DynamoDbStore(IDynamoDbContext ddb) : IDynamoDbStore
                 var duplicateEntity = ddb.ToObject<IdempotencyEntity>(document!);
 
                 entity = await GetTodoItemAsync(duplicateEntity.TenantId, duplicateEntity.TodoItemId, ct);
-                if (entity == null) throw new InvalidOperationException("Failed to find duplicate TodoItem entity");
-                
+                if (entity == null)
+                    throw new InvalidOperationException("Failed to find duplicate TodoItem entity");
+
                 return entity;
             }
 
@@ -92,23 +96,26 @@ public class DynamoDbStore(IDynamoDbContext ddb) : IDynamoDbStore
         var pk = TodoItemEntity.Pk(args.TenantId, args.TodoItemId);
         var sk = TodoItemEntity.Sk(args.TodoItemId);
         var now = DateTime.UtcNow;
-        
+
         var condition = Condition.ForEntity<TodoItemEntity>();
-        var expression = Joiner.And(condition.On(x => x.PK).Exists(),
-            condition.On(x => x.SK).Exists());
+        var expression = Joiner.And(condition.On(x => x.PK).Exists(), condition.On(x => x.SK).Exists());
 
         try
         {
             var entity = await ddb.UpdateItem<TodoItemEntity>()
                 .WithPrimaryKey(pk, sk)
                 .WithCondition(expression)
-                .On(x => x.Title).Assign(args.Title)
-                .On(x => x.Notes).Assign(args.Notes)
-                .On(x => x.IsCompleted).Assign(args.IsCompleted)
-                .On(x => x.UpdatedDate).Assign(now)
+                .On(x => x.Title)
+                .Assign(args.Title)
+                .On(x => x.Notes)
+                .Assign(args.Notes)
+                .On(x => x.IsCompleted)
+                .Assign(args.IsCompleted)
+                .On(x => x.UpdatedDate)
+                .Assign(now)
                 .WithReturnValues(ReturnValues.AllNew)
                 .ToItemAsync(ct);
-            
+
             return entity;
         }
         catch (ConditionalCheckFailedException)
@@ -122,17 +129,13 @@ public class DynamoDbStore(IDynamoDbContext ddb) : IDynamoDbStore
     {
         var pk = TodoItemEntity.Pk(args.TenantId, args.TodoItemId);
         var sk = TodoItemEntity.Sk(args.TodoItemId);
-        
+
         var condition = Condition.ForEntity<TodoItemEntity>();
-        var expression = Joiner.And(condition.On(x => x.PK).Exists(),
-            condition.On(x => x.SK).Exists());
-        
+        var expression = Joiner.And(condition.On(x => x.PK).Exists(), condition.On(x => x.SK).Exists());
+
         try
         {
-            await ddb.DeleteItem<TodoItemEntity>()
-                .WithPrimaryKey(pk, sk)
-                .WithCondition(expression)
-                .ExecuteAsync(ct);
+            await ddb.DeleteItem<TodoItemEntity>().WithPrimaryKey(pk, sk).WithCondition(expression).ExecuteAsync(ct);
 
             return true;
         }
@@ -147,7 +150,7 @@ public class DynamoDbStore(IDynamoDbContext ddb) : IDynamoDbStore
     {
         var pk = TodoItemEntity.Pk(tenantId, todoItemId);
         var sk = TodoItemEntity.Sk(todoItemId);
-        
+
         var entity = await ddb.GetItemAsync<TodoItemEntity>(pk, sk, ct);
 
         return entity;
@@ -156,12 +159,9 @@ public class DynamoDbStore(IDynamoDbContext ddb) : IDynamoDbStore
     public async Task<PagedResult<TodoItemEntity>> ListTodoItemsAsync(string tenantId, int limit, bool? isComplete = null, string? paginationToken = null)
     {
         var gs1Pk = TodoItemEntity.Gsi1Pk(tenantId);
-        
+
         var keyCondition = Condition.ForEntity<TodoItemEntity>();
-        var keyExpression = Joiner.And(
-            keyCondition.On(x => x.GSI1PK).EqualTo(gs1Pk),
-            keyCondition.On(x => x.GSI1SK).BeginsWith("TODOITEM#")
-        );
+        var keyExpression = Joiner.And(keyCondition.On(x => x.GSI1PK).EqualTo(gs1Pk), keyCondition.On(x => x.GSI1SK).BeginsWith("TODOITEM#"));
 
         var query = ddb.Query<TodoItemEntity>()
             .FromIndex(Gsi1IndexName)
@@ -175,7 +175,7 @@ public class DynamoDbStore(IDynamoDbContext ddb) : IDynamoDbStore
             var filterExpression = Condition<TodoItemEntity>.On(x => x.IsCompleted).EqualTo(isComplete.Value);
             query = query.WithFilterExpression(filterExpression);
         }
-        
+
         var page = await query.ToPageAsync();
         return page;
     }

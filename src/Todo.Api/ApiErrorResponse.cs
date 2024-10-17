@@ -19,16 +19,16 @@ public class ApiErrorResponse
             StatusCode = 404,
             ErrorCode = "NotFoundError",
             ErrorMessage = "Not found",
-            Errors = []
+            Errors = [],
         };
-    
+
     public static ApiErrorResponse ValidationError() =>
         new()
         {
             ErrorCode = "ValidationError",
             ErrorMessage = "Validation error",
             StatusCode = 400,
-            Errors = []
+            Errors = [],
         };
 
     public static ApiErrorResponse InternalServerError() =>
@@ -37,6 +37,6 @@ public class ApiErrorResponse
             ErrorCode = "InternalServerError",
             ErrorMessage = "Internal server error",
             StatusCode = 500,
-            Errors = []
+            Errors = [],
         };
 }

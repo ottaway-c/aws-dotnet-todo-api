@@ -5,17 +5,18 @@ namespace Todo.Core.Entities;
 public class IdempotencyEntity : BaseEntity
 {
     public static string Pk(string tenantId, Ulid idempotencyToken) => $"TENANT#{tenantId}#IDEMPOTENCY#{idempotencyToken}";
-    public static string Sk(Ulid idempotencyToken) =>  $"IDEMPOTENCY#{idempotencyToken}";
-    
+
+    public static string Sk(Ulid idempotencyToken) => $"IDEMPOTENCY#{idempotencyToken}";
+
     [DynamoDbProperty(nameof(TodoItemId), typeof(UlidConverter))]
     public required Ulid TodoItemId { get; init; }
-    
+
     [DynamoDbProperty(nameof(TenantId))]
     public required string TenantId { get; init; }
-    
+
     [DynamoDbProperty(nameof(IdempotencyToken), typeof(UlidConverter))]
     public required Ulid IdempotencyToken { get; init; }
-    
+
     public static IdempotencyEntity Create(CreateTodoItemArgs args, TodoItemEntity todoItemEntity)
     {
         var pk = Pk(args.TenantId, args.IdempotencyToken);
@@ -30,7 +31,7 @@ public class IdempotencyEntity : BaseEntity
             IdempotencyToken = args.IdempotencyToken,
             CreatedDate = todoItemEntity.CreatedDate,
             UpdatedDate = todoItemEntity.UpdatedDate,
-            Entity = "Idempotency"
+            Entity = "Idempotency",
         };
 
         return entity;

@@ -11,14 +11,14 @@ public class GetTodoItemTests(Fixture fixture, ITestOutputHelper output) : TestC
     {
         var tenantId = Given.TenantId();
         var client = Fixture.Client;
-        
+
         var now = DateTime.UtcNow;
-        
+
         var args = Given.CreateTodoItemArgs(tenantId);
         var entity = await Fixture.DdbStore.CreateTodoItemAsync(args, CancellationToken.None);
 
         var response = await client.V1.Tenant[tenantId].Todo[entity.TodoItemId.ToString()].GetAsync();
-        
+
         response.Should().NotBeNull();
         response!.TodoItem.Should().NotBeNull();
         response.TodoItem!.TodoItemId.Should().NotBeNull();
@@ -27,19 +27,19 @@ public class GetTodoItemTests(Fixture fixture, ITestOutputHelper output) : TestC
         response.TodoItem.Title.Should().Be(args.Title);
         response.TodoItem.Notes.Should().Be(args.Notes);
         response.TodoItem.IsCompleted.Should().BeFalse();
-        
+
         // NOTE: Allow for some variation in the clock skew.
         response.TodoItem.CreatedDate.Should().BeCloseTo(now, TimeSpan.FromMinutes(2));
         response.TodoItem.UpdatedDate.Should().BeCloseTo(now, TimeSpan.FromMinutes(2));
     }
-    
+
     [Fact]
     public async Task GetTodoItem_NotFound()
     {
         var tenantId = Given.TenantId();
         var todoItemId = Ulid.NewUlid(); // Note: Bogus todoitem id
         var client = Fixture.Client;
-        
-       await Assert.ThrowsAsync<ApiErrorResponse>(async () => await client.V1.Tenant[tenantId].Todo[todoItemId.ToString()].GetAsync());
+
+        await Assert.ThrowsAsync<ApiErrorResponse>(async () => await client.V1.Tenant[tenantId].Todo[todoItemId.ToString()].GetAsync());
     }
 }

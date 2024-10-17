@@ -13,7 +13,7 @@ public static class Given
             Title = Ulid.NewUlid().ToString(),
             Notes = Ulid.NewUlid().ToString(),
             TenantId = Ulid.NewUlid().ToString(),
-            IdempotencyToken = Ulid.NewUlid()
+            IdempotencyToken = Ulid.NewUlid(),
         };
 
         return request;
@@ -27,7 +27,7 @@ public static class Given
             TenantId = Ulid.NewUlid().ToString(),
             Title = Ulid.NewUlid().ToString(),
             Notes = Ulid.NewUlid().ToString(),
-            IsCompleted = true
+            IsCompleted = true,
         };
 
         return request;
@@ -35,22 +35,14 @@ public static class Given
 
     public static DeleteTodoItemRequest DeleteTodoItemRequest()
     {
-        var request = new DeleteTodoItemRequest
-        {
-            TodoItemId = Ulid.NewUlid(),
-            TenantId = Ulid.NewUlid().ToString()
-        };
+        var request = new DeleteTodoItemRequest { TodoItemId = Ulid.NewUlid(), TenantId = Ulid.NewUlid().ToString() };
 
         return request;
     }
 
     public static GetTodoItemRequest GetTodoItemRequest()
     {
-        var request = new GetTodoItemRequest
-        {
-            TodoItemId = Ulid.NewUlid(),
-            TenantId = Ulid.NewUlid().ToString()
-        };
+        var request = new GetTodoItemRequest { TodoItemId = Ulid.NewUlid(), TenantId = Ulid.NewUlid().ToString() };
 
         return request;
     }
@@ -62,7 +54,7 @@ public static class Given
             TenantId = Ulid.NewUlid().ToString(),
             Limit = 20,
             PaginationToken = Ulid.NewUlid().ToString(),
-            IsCompleted = true
+            IsCompleted = true,
         };
 
         return request;
@@ -75,37 +67,35 @@ public static class Given
             Title = Ulid.NewUlid().ToString(),
             Notes = Ulid.NewUlid().ToString(),
             TenantId = Ulid.NewUlid().ToString(),
-            IdempotencyToken = Ulid.NewUlid()
+            IdempotencyToken = Ulid.NewUlid(),
         };
 
         return args;
     }
-    
+
     public class TitleTestData : IEnumerable<object?[]>
     {
         public IEnumerator<object?[]> GetEnumerator()
         {
-      
-            yield return new object? [] { null };
-            yield return new object [] { "" };
-            yield return new object [] { " " };
-            yield return new object [] { new string('*', 2) }; // Note: Minimum length is 3
-            yield return new object [] { new string('*', 101) }; // Note: Maximum length is 100
+            yield return new object?[] { null };
+            yield return new object[] { "" };
+            yield return new object[] { " " };
+            yield return new object[] { new string('*', 2) }; // Note: Minimum length is 3
+            yield return new object[] { new string('*', 101) }; // Note: Maximum length is 100
         }
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
     }
-    
+
     public class NotesTestData : IEnumerable<object?[]>
     {
         public IEnumerator<object?[]> GetEnumerator()
         {
-      
-            yield return new object? [] { null };
-            yield return new object [] { "" };
-            yield return new object [] { " " };
-            yield return new object [] { new string('*', 2) }; // Note: Minimum length is 3
-            yield return new object [] { new string('*', 101) }; // Note: Maximum length is 100
+            yield return new object?[] { null };
+            yield return new object[] { "" };
+            yield return new object[] { " " };
+            yield return new object[] { new string('*', 2) }; // Note: Minimum length is 3
+            yield return new object[] { new string('*', 101) }; // Note: Maximum length is 100
         }
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
