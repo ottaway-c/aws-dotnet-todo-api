@@ -7,11 +7,7 @@ public static class Given
 {
     public static CreateTodoItemRequest CreateTodoItemRequest()
     {
-        var request = new CreateTodoItemRequest
-        {
-            Title = Ulid.NewUlid().ToString(),
-            Notes = Ulid.NewUlid().ToString()
-        };
+        var request = new CreateTodoItemRequest { Title = Ulid.NewUlid().ToString(), Notes = Ulid.NewUlid().ToString() };
 
         return request;
     }
@@ -22,12 +18,12 @@ public static class Given
         {
             Title = Ulid.NewUlid().ToString(),
             Notes = Ulid.NewUlid().ToString(),
-            IsCompleted = true
+            IsCompleted = true,
         };
 
         return request;
     }
-    
+
     public static CreateTodoItemArgs CreateTodoItemArgs(string? tenantId = null)
     {
         var args = new CreateTodoItemArgs
@@ -35,12 +31,12 @@ public static class Given
             Title = Ulid.NewUlid().ToString(),
             Notes = Ulid.NewUlid().ToString(),
             TenantId = tenantId ?? TenantId(),
-            IdempotencyToken = Ulid.NewUlid()
+            IdempotencyToken = Ulid.NewUlid(),
         };
 
         return args;
     }
-    
+
     public static string TenantId()
     {
         var tenantId = Ulid.NewUlid().ToString().ToLower();

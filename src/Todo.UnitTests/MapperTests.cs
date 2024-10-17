@@ -7,12 +7,12 @@ namespace Todo.UnitTests;
 public class MapperTests
 {
     private readonly Mapper _mapper = new();
-    
+
     [Fact]
     public void MapTodoItemEntityToDto()
     {
         var now = DateTime.UtcNow;
-        
+
         var entity = new TodoItemEntity
         {
             PK = "",
@@ -27,9 +27,9 @@ public class MapperTests
             IdempotencyToken = Ulid.NewUlid(),
             CreatedDate = now,
             UpdatedDate = now,
-            Entity = "TodoItem"
+            Entity = "TodoItem",
         };
-        
+
         var dto = _mapper.TodoItemEntityToDto(entity);
 
         dto.Should().NotBeNull();
@@ -60,7 +60,7 @@ public class MapperTests
     {
         var request = Given.UpdateTodoItemRequest();
         var args = _mapper.UpdateTodoItemRequestToArgs(request);
-        
+
         args.Should().NotBeNull();
         args.TodoItemId.Should().BeEquivalentTo(request.TodoItemId);
         args.TenantId.Should().BeEquivalentTo(request.TenantId);

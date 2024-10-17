@@ -14,13 +14,13 @@ public class TodoItemEntityTests
             Title = "Put out the washing",
             Notes = "Reminder: Clothes are still in the machine!",
             TenantId = Ulid.NewUlid().ToString(),
-            IdempotencyToken = Ulid.NewUlid()
+            IdempotencyToken = Ulid.NewUlid(),
         };
 
         var now = DateTime.UtcNow;
 
         var entity = TodoItemEntity.Create(args);
-        
+
         entity.Should().NotBeNull();
         entity.TodoItemId.Should().NotBeNull();
         entity.PK.Should().Be($"TENANT#{entity.TenantId}#TODOITEM#{entity.TodoItemId}");

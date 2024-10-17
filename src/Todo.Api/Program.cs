@@ -14,28 +14,21 @@ public class Program
 {
     public static async Task Main(string[] args)
     {
-        Log.Logger = new LoggerConfiguration()
-            .WriteTo.Console()
-            .CreateLogger();
-        
-        DotEnv.Fluent()
-            .WithTrimValues()
-            .WithEncoding(Encoding.UTF8)
-            .WithOverwriteExistingVars()
-            .WithProbeForEnv(8)
-            .Load();
-        
+        Log.Logger = new LoggerConfiguration().WriteTo.Console().CreateLogger();
+
+        DotEnv.Fluent().WithTrimValues().WithEncoding(Encoding.UTF8).WithOverwriteExistingVars().WithProbeForEnv(8).Load();
+
         FluentValidationOptions.Configure();
-        
+
         var region = Env.GetRegion();
         var credentials = Env.GetAwsCredentials("todo-api");
-        
+
         var service = Env.GetString("SERVICE");
         var stage = Env.GetString("STAGE");
-        
+
         var builder = WebApplication.CreateBuilder(args);
         builder.Host.UseSerilog();
-        
+
         builder.Services.AddSingleton<IDynamoDbContext>(_ =>
         {
             var provider = new AWSCredentialsProvider(credentials);
@@ -46,7 +39,7 @@ public class Program
 
         builder.Services.AddSingleton<IDynamoDbStore, DynamoDbStore>();
         builder.Services.AddSingleton<Mapper>();
-        
+
         //
         // Hosting
         //
@@ -65,7 +58,7 @@ public class Program
                 s.Version = "v1";
             };
         });
-        
+
         //
         // Application
         //
@@ -82,7 +75,7 @@ public class Program
             {
                 ep.DontCatchExceptions();
                 ep.PreProcessor<TenantIdChecker>(Order.Before);
-                
+
                 // Note: Obviously in a production scenario this API would be secured
                 // I've made it anonymous to keep things simple
                 ep.AllowAnonymous();
@@ -96,9 +89,9 @@ public class Program
                 }
             };
         });
-        
+
         app.UseSwaggerGen();
-        
+
         await app.GenerateApiClientsAndExitAsync(cs =>
         {
             cs.Language = GenerationLanguage.CSharp;
@@ -107,7 +100,7 @@ public class Program
             cs.ClientNamespaceName = "Todo.Client";
             cs.ClientClassName = "TodoClient";
         });
-        
+
         await app.RunAsync();
     }
 }

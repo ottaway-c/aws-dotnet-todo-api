@@ -81,7 +81,6 @@ npm i
 Create a `.env` file and add the following variables:
 
 ```
-AWS_PROFILE=todo-api-docker # This is the profile ECS local endpoints will look for when vending credentials to the docker container. Note that integration/e2e tests will also use these creds when run locally.
 AWS_REGION=<AWS_REGION>
 CDK_DEFAULT_ACCOUNT=<AWS_ACCOUNT_ID>
 CDK_DEFAULT_REGION=<AWS_REGION>
@@ -174,7 +173,7 @@ cdk destroy todo-api-feat-1008-ecr --profile todo-api
 
 ## Dotnet Tools
 
-I am are using CSharpier to format C# code
+I am using CSharpier to format C# code
 
 Install CShariper and Kiota
 
@@ -197,7 +196,6 @@ dotnet tool update csharpier
 Run formatter
 
 ```
-
 npm run format
 ```
 

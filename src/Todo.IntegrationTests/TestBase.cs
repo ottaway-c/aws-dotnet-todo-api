@@ -26,6 +26,7 @@ public abstract class TestBase<TAppFixture> : IAsyncLifetime, IClassFixture<TApp
     }
 
     protected virtual Task SetupAsync() => Task.CompletedTask;
+
     protected virtual Task TearDownAsync() => Task.CompletedTask;
 
     Task IAsyncLifetime.InitializeAsync() => SetupAsync();
@@ -96,7 +97,7 @@ public abstract class AppFixture<TProgram> : IAsyncLifetime
         var type = GetType();
 
         _app = (WebApplicationFactory<TProgram>)WafCache.GetOrAdd(type, WafInitializer);
-        
+
         Client = _app.CreateClient();
 
         await SetupAsync();

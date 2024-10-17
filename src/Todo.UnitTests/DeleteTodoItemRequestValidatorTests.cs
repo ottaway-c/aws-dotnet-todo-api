@@ -6,7 +6,7 @@ namespace Todo.UnitTests;
 public class DeleteTodoItemRequestValidatorTests
 {
     private readonly DeleteTodoItemRequestValidator _validator = new();
-    
+
     [Fact]
     public void ShouldNotHaveErrorsForValidRequest()
     {
@@ -15,7 +15,7 @@ public class DeleteTodoItemRequestValidatorTests
         var result = _validator.TestValidate(request);
         result.ShouldNotHaveAnyValidationErrors();
     }
-    
+
     [Fact]
     public void TodoItemIdIsRequired()
     {
@@ -25,7 +25,7 @@ public class DeleteTodoItemRequestValidatorTests
         var result = _validator.TestValidate(request);
         result.ShouldHaveValidationErrorFor(x => x.TodoItemId);
     }
-    
+
     [Fact]
     public void TenantIdIsRequired()
     {

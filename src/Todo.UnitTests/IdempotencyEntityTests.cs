@@ -9,10 +9,10 @@ public class IdempotencyEntityTests
     public void Map()
     {
         var args = Given.CreateTodoItemArgs();
-        
+
         var todoItemEntity = TodoItemEntity.Create(args);
         var entity = IdempotencyEntity.Create(args, todoItemEntity);
-        
+
         entity.Should().NotBeNull();
         entity.TodoItemId.Should().BeEquivalentTo(todoItemEntity.TodoItemId);
         entity.IdempotencyToken.Should().BeEquivalentTo(args.IdempotencyToken);

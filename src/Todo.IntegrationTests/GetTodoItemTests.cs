@@ -18,42 +18,39 @@ public class GetTodoItemTests(Fixture fixture, ITestOutputHelper output) : TestB
 
         var request = Given.GetTodoItemRequest(entity.TenantId, entity.TodoItemId);
         var (httpResponse, response) = await Fixture.Client.GETAsync<GetTodoItemEndpoint, GetTodoItemRequest, GetTodoItemResponse>(request);
-        
+
         httpResponse.StatusCode.Should().Be(HttpStatusCode.OK);
 
         response.Should().NotBeNull();
         response.TodoItem.Should().NotBeNull();
-        
+
         var todoItemDto = Fixture.Mapper.TodoItemEntityToDto(entity!);
         response.TodoItem.Should().BeEquivalentTo(todoItemDto);
     }
-    
+
     [Fact]
     public async Task GetTodoItem_NotFound()
     {
         var tenantId = Given.TenantId();
         var todoItemId = Ulid.NewUlid(); // Note: TodoItem does not exist
-        
-        var request = Given.GetTodoItemRequest(tenantId, todoItemId); 
+
+        var request = Given.GetTodoItemRequest(tenantId, todoItemId);
         var (httpResponse, response) = await Fixture.Client.GETAsync<GetTodoItemEndpoint, GetTodoItemRequest, ApiErrorResponse>(request);
-        
+
         httpResponse.StatusCode.Should().Be(HttpStatusCode.NotFound);
         response.Should().NotBeNull();
     }
-    
+
     [Fact]
     public async Task GetTodoItem_ValidationFailure()
     {
         var tenantId = Given.TenantId();
-        
+
         // Note: Missing TodoItemId
-        var request = new GetTodoItemRequest
-        {
-            TenantId = tenantId
-        }; 
+        var request = new GetTodoItemRequest { TenantId = tenantId };
 
         var (httpResponse, response) = await Fixture.Client.GETAsync<GetTodoItemEndpoint, GetTodoItemRequest, ApiErrorResponse>(request);
-        
+
         httpResponse.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         response.Should().NotBeNull();
         response.StatusCode.Should().Be((int)HttpStatusCode.BadRequest);

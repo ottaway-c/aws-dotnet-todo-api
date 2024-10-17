@@ -26,8 +26,7 @@ public class CreateTodoItemRequestValidator : Validator<CreateTodoItemRequest>
     }
 }
 
-public class CreateTodoItemEndpoint(IDynamoDbStore ddb, Mapper mapper)
-    : Endpoint<CreateTodoItemRequest, Ok<CreateTodoItemResponse>>
+public class CreateTodoItemEndpoint(IDynamoDbStore ddb, Mapper mapper) : Endpoint<CreateTodoItemRequest, Ok<CreateTodoItemResponse>>
 {
     public override void Configure()
     {
@@ -49,10 +48,7 @@ public class CreateTodoItemEndpoint(IDynamoDbStore ddb, Mapper mapper)
         var args = mapper.CreateTodoItemRequestToArgs(request);
         var entity = await ddb.CreateTodoItemAsync(args, ct);
 
-        var response = new CreateTodoItemResponse
-        {
-            TodoItem = mapper.TodoItemEntityToDto(entity)
-        };
+        var response = new CreateTodoItemResponse { TodoItem = mapper.TodoItemEntityToDto(entity) };
 
         return TypedResults.Ok(response);
     }

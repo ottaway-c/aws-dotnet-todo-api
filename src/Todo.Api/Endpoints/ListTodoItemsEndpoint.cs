@@ -26,8 +26,7 @@ public class ListTodoItemsRequestValidator : Validator<ListTodoItemsRequest>
     }
 }
 
-public class ListTodoItemsEndpoint(IDynamoDbStore ddbStore, Mapper mapper)
-    : Endpoint<ListTodoItemsRequest, Ok<ListTodoItemsResponse>>
+public class ListTodoItemsEndpoint(IDynamoDbStore ddbStore, Mapper mapper) : Endpoint<ListTodoItemsRequest, Ok<ListTodoItemsResponse>>
 {
     public override void Configure()
     {
@@ -37,7 +36,6 @@ public class ListTodoItemsEndpoint(IDynamoDbStore ddbStore, Mapper mapper)
         {
             s.Summary = "List TodoItems";
             s.Description = "List and filter TodoItems";
-            
         });
         Validator<ListTodoItemsRequestValidator>();
     }
@@ -46,28 +44,22 @@ public class ListTodoItemsEndpoint(IDynamoDbStore ddbStore, Mapper mapper)
     {
         // Note: Assign a default limit if the request does not contain one
         request.Limit ??= 25;
-        
+
         var page = await ddbStore.ListTodoItemsAsync(request.TenantId!, request.Limit.Value, request.IsCompleted, request.PaginationToken);
         if (page.Items.Count == 0)
         {
-            return TypedResults.Ok(new ListTodoItemsResponse
-            {
-                TodoItems = [],
-                PaginationToken = null
-            });
+            return TypedResults.Ok(new ListTodoItemsResponse { TodoItems = [], PaginationToken = null });
         }
-        
-        var items = page.Items.Select(x =>
-        {
-            var todoItem = mapper.TodoItemEntityToDto(x);
-            return todoItem;
-        }).ToList();
 
-        var response = new ListTodoItemsResponse
-        {
-            TodoItems = items,
-            PaginationToken = page.PaginationToken
-        };
+        var items = page
+            .Items.Select(x =>
+            {
+                var todoItem = mapper.TodoItemEntityToDto(x);
+                return todoItem;
+            })
+            .ToList();
+
+        var response = new ListTodoItemsResponse { TodoItems = items, PaginationToken = page.PaginationToken };
 
         return TypedResults.Ok(response);
     }
