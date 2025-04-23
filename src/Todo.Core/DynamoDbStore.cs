@@ -1,3 +1,5 @@
+using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using EfficientDynamoDb;
 using EfficientDynamoDb.Converters;
 using EfficientDynamoDb.DocumentModel;
@@ -71,7 +73,7 @@ public class DynamoDbStore(IDynamoDbContext ddb) : IDynamoDbStore
         }
         catch (TransactionCanceledException ex)
         {
-            if (ex.CancellationReasons.Any(x => x.Code == "ConditionalCheckFailed"))
+            if (ex.CancellationReasons.Any(x => string.Equals(x.Code, "ConditionalCheckFailed", StringComparison.OrdinalIgnoreCase)))
             {
                 // Note:
                 // Conditional check failures are returned in the order they are supplied to Dynamo.
@@ -90,7 +92,7 @@ public class DynamoDbStore(IDynamoDbContext ddb) : IDynamoDbStore
             throw;
         }
     }
-
+    
     public async Task<TodoItemEntity?> UpdateTodoItemAsync(UpdateTodoItemArgs args, CancellationToken ct)
     {
         var pk = TodoItemEntity.Pk(args.TenantId, args.TodoItemId);
@@ -150,7 +152,7 @@ public class DynamoDbStore(IDynamoDbContext ddb) : IDynamoDbStore
     {
         var pk = TodoItemEntity.Pk(tenantId, todoItemId);
         var sk = TodoItemEntity.Sk(todoItemId);
-
+        
         var entity = await ddb.GetItemAsync<TodoItemEntity>(pk, sk, ct);
 
         return entity;
@@ -187,7 +189,7 @@ public class UlidConverter : DdbConverter<Ulid>
     public override Ulid Read(in AttributeValue attributeValue)
     {
         var ulid = attributeValue.AsString();
-        return Ulid.Parse(ulid);
+        return Ulid.Parse(ulid, CultureInfo.InvariantCulture);
     }
 
     public override AttributeValue Write(ref Ulid value)
