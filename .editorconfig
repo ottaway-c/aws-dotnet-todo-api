@@ -1,5 +1,9 @@
 root = true
-[*]
+[*.cs]
+
+# 
+# Async
+# ----------------
 
 # AsyncFixer01: Unnecessary async/await usage
 dotnet_diagnostic.AsyncFixer01.severity = suggestion
@@ -77,4 +81,7 @@ dotnet_diagnostic.AsyncFixer05.severity = error
 MA0051.maximum_lines_per_method = 200
 MA0051.maximum_statements_per_method = 200
 
-dotnet_diagnostic.MA0048.excluded_symbol_names = *Args|*Converter|I*|*Formatter
+# MA0048: File name must match type name
+# Ignore certain symbols. default: none
+# Pipe-separated list of wildcard patterns
+dotnet_diagnostic.MA0048.excluded_symbol_names = *Args|*Converter|I*|*Formatter|*Fixture
