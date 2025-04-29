@@ -11,7 +11,7 @@ public class UpdateTodoItemTests(Fixture fixture, ITestOutputHelper output) : Te
         var tenantId = Given.TenantId();
         var client = Fixture.Client;
 
-        var now = DateTime.UtcNow;
+        var now = DateTimeOffset.UtcNow;
 
         var args = Given.CreateTodoItemArgs(tenantId);
         var entity = await Fixture.DdbStore.CreateTodoItemAsync(args, CancellationToken.None);

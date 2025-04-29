@@ -12,7 +12,7 @@ public class GetTodoItemTests(Fixture fixture, ITestOutputHelper output) : TestC
         var tenantId = Given.TenantId();
         var client = Fixture.Client;
 
-        var now = DateTime.UtcNow;
+        var now = DateTimeOffset.UtcNow;
 
         var args = Given.CreateTodoItemArgs(tenantId);
         var entity = await Fixture.DdbStore.CreateTodoItemAsync(args, CancellationToken.None);

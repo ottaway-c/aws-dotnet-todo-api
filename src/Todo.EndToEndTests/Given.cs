@@ -1,3 +1,4 @@
+using System.Globalization;
 using Todo.Client.Models;
 using Todo.Core;
 
@@ -39,7 +40,7 @@ public static class Given
 
     public static string TenantId()
     {
-        var tenantId = Ulid.NewUlid().ToString().ToLower();
+        var tenantId = Ulid.NewUlid().ToString().ToLower(CultureInfo.InvariantCulture);
 
         return tenantId;
     }

@@ -13,7 +13,7 @@ public class ListTodoItemsRequest : ITenantId
 
 public class ListTodoItemsResponse
 {
-    public required List<TodoItemDto> TodoItems { get; init; }
+    public required IList<TodoItemDto> TodoItems { get; init; }
     public required string? PaginationToken { get; init; }
 }
 

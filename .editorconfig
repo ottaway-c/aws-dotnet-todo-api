@@ -1,9 +1,20 @@
 root = true
 [*.cs]
 
-# 
-# Async
-# ----------------
+# ----------------------------
+# C# Code Style
+# ----------------------------
+
+# MA0051: Method is too long
+MA0051.maximum_lines_per_method = 200
+MA0051.maximum_statements_per_method = 200
+
+# MA0048: File name must match type name
+dotnet_diagnostic.MA0048.severity = none
+
+# ----------------------------
+# C# Async/Await
+# ----------------------------
 
 # AsyncFixer01: Unnecessary async/await usage
 dotnet_diagnostic.AsyncFixer01.severity = suggestion
@@ -18,7 +29,7 @@ dotnet_diagnostic.VSTHRD103.severity = error
 dotnet_diagnostic.AsyncFixer03.severity = error
 
 # # VSTHRD100: Avoid async void methods
-dotnet_diagnostic.VSTHRD100.severity = suggestion
+dotnet_diagnostic.VSTHRD100.severity = error
 
 # VSTHRD101: Avoid unsupported async delegates
 dotnet_diagnostic.VSTHRD101.severity = error
@@ -60,7 +71,7 @@ dotnet_diagnostic.MA0022.severity = error
 dotnet_diagnostic.VSTHRD114.severity = error
 
 # VSTHRD200: Use "Async" suffix for async methods
-dotnet_diagnostic.VSTHRD200.severity = suggestion
+dotnet_diagnostic.VSTHRD200.severity = error
 
 # MA0040: Specify a cancellation token
 dotnet_diagnostic.MA0032.severity = suggestion
@@ -76,12 +87,3 @@ dotnet_diagnostic.MA0080.severity = error
 
 #AsyncFixer05: Downcasting from a nested task to an outer task.
 dotnet_diagnostic.AsyncFixer05.severity = error
-
-# MA0051: Method is too long
-MA0051.maximum_lines_per_method = 200
-MA0051.maximum_statements_per_method = 200
-
-# MA0048: File name must match type name
-# Ignore certain symbols. default: none
-# Pipe-separated list of wildcard patterns
-dotnet_diagnostic.MA0048.excluded_symbol_names = *Args|*Converter|I*|*Formatter|*Fixture
