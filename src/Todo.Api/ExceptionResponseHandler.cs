@@ -22,7 +22,7 @@ public class ExceptionResponseHandler : Microsoft.AspNetCore.Diagnostics.IExcept
                 context.Response.StatusCode = errorResponse.StatusCode;
                 if (validationEx.Failures is not null)
                 {
-                    foreach (var grouping in validationEx.Failures.GroupBy(x => x.PropertyName))
+                    foreach (var grouping in validationEx.Failures.GroupBy(x => x.PropertyName, StringComparer.OrdinalIgnoreCase))
                     {
                         errorResponse.Errors.Add(new ApiError { Key = grouping.Key, Errors = grouping.Select(x => x.ErrorMessage).ToList() });
                     }

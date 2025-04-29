@@ -1,3 +1,5 @@
+using System.Globalization;
+
 namespace Todo.Api;
 
 public interface ITenantId
@@ -15,7 +17,7 @@ public class TenantIdChecker : IGlobalPreProcessor
             // Standardise the tenant id
             // This is important as we store the tenant id in Dynamo as part of the PK
             // Casing inconsistency could cause queries/updates to fail
-            request.TenantId = request.TenantId!.ToLower();
+            request.TenantId = request.TenantId!.ToLower(CultureInfo.InvariantCulture);
 
             await Task.CompletedTask;
         }

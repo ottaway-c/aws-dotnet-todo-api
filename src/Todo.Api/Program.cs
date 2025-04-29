@@ -92,7 +92,7 @@ public class Program
 
         app.UseSwaggerGen();
 
-        await app.GenerateApiClientsAndExitAsync(cs =>
+        await app.GenerateApiClientsAndExitAsync(CancellationToken.None, cs =>
         {
             cs.Language = GenerationLanguage.CSharp;
             cs.SwaggerDocumentName = "v1";

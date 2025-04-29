@@ -3,7 +3,7 @@ namespace Todo.Api;
 public class ApiError
 {
     public required string Key { get; set; }
-    public required List<string> Errors { get; set; } = [];
+    public required IList<string> Errors { get; set; } = [];
 }
 
 public class ApiErrorResponse
@@ -11,7 +11,7 @@ public class ApiErrorResponse
     public required string ErrorCode { get; set; }
     public required string ErrorMessage { get; set; }
     public required int StatusCode { get; set; }
-    public required List<ApiError> Errors { get; set; }
+    public required IList<ApiError> Errors { get; set; }
 
     public static ApiErrorResponse NotFound() =>
         new()

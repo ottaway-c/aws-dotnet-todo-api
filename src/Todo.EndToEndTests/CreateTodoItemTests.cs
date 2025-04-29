@@ -11,7 +11,7 @@ public class CreateTodoItemTests(Fixture fixture, ITestOutputHelper output) : Te
         var tenantId = Given.TenantId();
         var client = Fixture.Client;
 
-        var now = DateTime.UtcNow;
+        var now = DateTimeOffset.UtcNow;
 
         var request = Given.CreateTodoItemRequest();
         var response = await client.V1.Tenant[tenantId].Todo.PostAsync(request);
@@ -19,7 +19,7 @@ public class CreateTodoItemTests(Fixture fixture, ITestOutputHelper output) : Te
         response.Should().NotBeNull();
         response!.TodoItem.Should().NotBeNull();
         response.TodoItem!.TodoItemId.Should().NotBeNull();
-        response.TodoItem.TenantId.Should().Be(tenantId.ToString());
+        response.TodoItem.TenantId.Should().Be(tenantId);
         response.TodoItem.IdempotencyToken.Should().NotBeNull();
         response.TodoItem.Title.Should().Be(request.Title);
         response.TodoItem.Notes.Should().Be(request.Notes);
