@@ -208,7 +208,7 @@ dotnet_diagnostic.VSTHRD103.severity = error
 # AsyncFixer03: Fire & forget async void methods
 dotnet_diagnostic.AsyncFixer03.severity = error
 
-# # VSTHRD100: Avoid async void methods
+# VSTHRD100: Avoid async void methods
 dotnet_diagnostic.VSTHRD100.severity = error
 
 # VSTHRD101: Avoid unsupported async delegates
@@ -267,3 +267,13 @@ dotnet_diagnostic.MA0080.severity = error
 
 #AsyncFixer05: Downcasting from a nested task to an outer task.
 dotnet_diagnostic.AsyncFixer05.severity = error
+
+# ----------------------------
+# C# Tests
+# ----------------------------
+
+[*{Tests}.cs]
+
+# VSTHRD200: Use "Async" suffix for async methods
+dotnet_diagnostic.VSTHRD200.severity = none
+dotnet_analyzer_diagnostic.VSTHRD200.severity = none
