@@ -29,6 +29,8 @@ jobs:
         with:
           node-version: 20
       - run: npm ci
+      - name: Run linting check
+      - run: dotnet format --verify-no-changes
       - uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: arn:aws:iam::${{ env.CDK_DEFAULT_ACCOUNT }}:role/github-actions
