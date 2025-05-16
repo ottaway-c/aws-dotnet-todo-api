@@ -92,7 +92,7 @@ public class DynamoDbStore(IDynamoDbContext ddb) : IDynamoDbStore
             throw;
         }
     }
-    
+
     public async Task<TodoItemEntity?> UpdateTodoItemAsync(UpdateTodoItemArgs args, CancellationToken ct)
     {
         var pk = TodoItemEntity.Pk(args.TenantId, args.TodoItemId);
@@ -152,7 +152,7 @@ public class DynamoDbStore(IDynamoDbContext ddb) : IDynamoDbStore
     {
         var pk = TodoItemEntity.Pk(tenantId, todoItemId);
         var sk = TodoItemEntity.Sk(todoItemId);
-        
+
         var entity = await ddb.GetItemAsync<TodoItemEntity>(pk, sk, ct);
 
         return entity;
