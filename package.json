@@ -20,6 +20,7 @@
         "aws-cdk": "2.1016.0",
         "esbuild": "0.25.4",
         "ts-node": "10.9.2",
+        "tsx": "4.19.4",
         "typescript": "5.8.3"
     },
     "dependencies": {
