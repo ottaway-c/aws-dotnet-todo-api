@@ -6,24 +6,24 @@ A simple Todo REST API that leverages API Gateway, Lambda and DynamoDB.
 
 ### Design considerations:
 
-- The entire application is deployed as a container running in AWS Lambda.
-- I opted to use the request, endpoint, response ([REPR](https://deviq.com/design-patterns/repr-design-pattern)) design pattern.
-- Input must be validated validated using fluent validation.
-- Endpoints should be easy to test.
-- Structured logging using the Serilog logging library.
+-   The entire application is deployed as a container running in AWS Lambda.
+-   I opted to use the request, endpoint, response ([REPR](https://deviq.com/design-patterns/repr-design-pattern)) design pattern.
+-   Input must be validated validated using fluent validation.
+-   Endpoints should be easy to test.
+-   Structured logging using the Serilog logging library.
 
 ### I have used the latest .NET language/compiler features such as:
 
-- Nullable value types and use of the 'required' modifier for class properties.
-- Compile time checking of potential null reference exceptions.
-- Source generators for JSON and object mapping.
+-   Nullable value types and use of the 'required' modifier for class properties.
+-   Compile time checking of potential null reference exceptions.
+-   Source generators for JSON and object mapping.
 
 ### Infrastructure components
 
-- AWS Lambda ⚡
-- Elastic Container Repository (ECR)
-- API Gateway
-- DynamoDb
+-   AWS Lambda ⚡
+-   Elastic Container Repository (ECR)
+-   API Gateway
+-   DynamoDb
 
 ### AWS CDK
 
@@ -31,19 +31,19 @@ I utilised AWS CDK to provision the required API Gateway, DynamoDB table, ECR re
 
 AWS CDK was chosen for the following reasons:
 
-- Type safety and code completion in your IDE of choice.
-- Sensible defaults when provisioning resources.
-- Easy to integrate with CI/CD such as GitHub Actions.
-- Simplifies the granting of IAM permissions and enforces best practices.
-- Ability to create more advanced infrastructure without having to write raw CloudFormation.
+-   Type safety and code completion in your IDE of choice.
+-   Sensible defaults when provisioning resources.
+-   Easy to integrate with CI/CD such as GitHub Actions.
+-   Simplifies the granting of IAM permissions and enforces best practices.
+-   Ability to create more advanced infrastructure without having to write raw CloudFormation.
 
 ### Testing Strategy
 
 I've followed a pretty standard approach for testing serverless applications:
 
-- Unit tests — Anything that can be run in memory for example validators
-- Integration tests — Test that the code functions correctly against real AWS infrastructure like DynamoDB.
-- End to end tests — Test the full application usually against the actual HTTP API. This is important to make sure that IAM permissions have been setup correctly.
+-   Unit tests — Anything that can be run in memory for example validators
+-   Integration tests — Test that the code functions correctly against real AWS infrastructure like DynamoDB.
+-   End to end tests — Test the full application usually against the actual HTTP API. This is important to make sure that IAM permissions have been setup correctly.
 
 For more information about serverless testing I recommend [this blog post](https://theburningmonk.com/2022/05/my-testing-strategy-for-serverless-applications/).
 
@@ -51,18 +51,18 @@ For more information about serverless testing I recommend [this blog post](https
 
 I have included the following Github Actions that run when creating PR’s into various branches:
 
-- check.yml — Runs on pull requests to the dev branch. This is used to test feature branches. An ephemeral stack is stood up, and integration/e2e tests run against it.
-- cleanup.yml — Runs when pull request to the dev branch are closed. Runs 'cdk destroy' to cleanup feature branch stacks.
-- dev.yml — Runs when a pull request is merged to the dev branch. Deploys the stack to dev, and runs e2e tests.
-- prod.yml — Runs when a pull request is merged to the main branch. Deploys the stack to prod, and runs e2e tests.
+-   check.yml — Runs on pull requests to the dev branch. This is used to test feature branches. An ephemeral stack is stood up, and integration/e2e tests run against it.
+-   cleanup.yml — Runs when pull request to the dev branch are closed. Runs 'cdk destroy' to cleanup feature branch stacks.
+-   dev.yml — Runs when a pull request is merged to the dev branch. Deploys the stack to dev, and runs e2e tests.
+-   prod.yml — Runs when a pull request is merged to the main branch. Deploys the stack to prod, and runs e2e tests.
 
 ## Prereqs
 
-- Install VS Code for working in CDK in Typescript
-- Install .Net 8 SDK https://dotnet.microsoft.com/en-us/download/dotnet/8.0
-- Install Node.js 20 LTS https://nodejs.org/en/
-- Install CDK cli tool globally https://docs.aws.amazon.com/cdk/v2/guide/getting_started.html
-- Install AWS cli tool https://aws.amazon.com/cli/ and setup default credentials using `aws configure`.
+-   Install VS Code for working in CDK in Typescript
+-   Install .Net 8 SDK https://dotnet.microsoft.com/en-us/download/dotnet/8.0
+-   Install Node.js 20 LTS https://nodejs.org/en/
+-   Install CDK cli tool globally https://docs.aws.amazon.com/cdk/v2/guide/getting_started.html
+-   Install AWS cli tool https://aws.amazon.com/cli/ and setup default credentials using `aws configure`.
 
 ## Install
 
@@ -173,9 +173,9 @@ cdk destroy todo-api-feat-1008-ecr --profile todo-api
 
 ## Dotnet Tools
 
-I am using CSharpier to format C# code
+I am using DotNet Format to format C# code
 
-Install CShariper and Kiota
+Install DotNet Format and Kiota
 
 ```
 dotnet tool restore
@@ -187,10 +187,10 @@ Upgrading Kiota
 dotnet tool update microsoft.openapi.kiota
 ```
 
-Upgrading CSharpier
+Upgrading DotNet Format
 
 ```
-dotnet tool update csharpier
+dotnet tool update dotnet-format
 ```
 
 Run formatter
