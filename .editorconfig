@@ -44,6 +44,10 @@ indent_size = 2
 [*.ts]
 indent_size = 2
 
+# json files
+[*.json]
+indent_size = 2
+
 # Shell scripts
 [*.sh]
 end_of_line = lf
