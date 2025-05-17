@@ -40,6 +40,14 @@ indent_size = 2
 [*.{yml,yaml}]
 indent_size = 2
 
+# TS files
+[*.ts]
+indent_size = 2
+
+# json files
+[*.json]
+indent_size = 2
+
 # Shell scripts
 [*.sh]
 end_of_line = lf

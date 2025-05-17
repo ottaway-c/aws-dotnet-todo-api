@@ -32,7 +32,9 @@ export class AppStack extends cdk.Stack {
       tableName: `${this.stackName}-todo-table`,
       billingMode: dynamodb.BillingMode.PAY_PER_REQUEST,
       encryption: dynamodb.TableEncryption.AWS_MANAGED,
-      pointInTimeRecovery: true,
+      pointInTimeRecoverySpecification: {
+        pointInTimeRecoveryEnabled: true,
+      },
       partitionKey: {
         name: "PK",
         type: dynamodb.AttributeType.STRING,
